@@ -7,7 +7,7 @@ packages = ["src/lmx"]
 
 [project]
 name = "linearized-musicxml"
-version = "0.0.2-dev"
+version = "1.0.0"
 authors = [
   { name="Jiří Mayer", email="mayer@ufal.mff.cuni.cz" },
 ]
