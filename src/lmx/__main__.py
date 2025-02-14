@@ -56,7 +56,7 @@ def linearize(filename: str):
         mxl = MxlFile.load_mxl(filename)
     else:
         with open(filename, "r") as f:
-            input_xml = f.readline()
+            input_xml = f.read()
             mxl = MxlFile(ET.ElementTree(
                 ET.fromstring(input_xml))
             )
@@ -88,7 +88,7 @@ def delinearize(filename: str):
         input_lmx = sys.stdin.readline()
     else:
         with open(filename, "r") as f:
-            input_lmx = f.readline()
+            input_lmx = f.read()
 
     delinearizer = Delinearizer(
         errout=sys.stderr
