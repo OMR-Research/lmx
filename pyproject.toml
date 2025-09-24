@@ -23,5 +23,5 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Jirka-Mayer/lmx"
-Issues = "https://github.com/Jirka-Mayer/lmx/issues"
+Homepage = "https://github.com/OMR-Research/lmx"
+Issues = "https://github.com/OMR-Research/lmx/issues"
