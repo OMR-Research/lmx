@@ -1,5 +1,18 @@
 # Linearized MusicXML (LMX)
 
+[![License Apache 2.0](https://badgen.net/badge/license/mit/blue)](https://github.com/OMR-Research/lmx/blob/main/LICENSE)
+[![PyPI version](https://badge.fury.io/py/linearized-musicxml.svg)](https://pypi.org/project/linearized-musicxml/)
+[![Downloads](https://static.pepy.tech/badge/linearized-musicxml)](https://pepy.tech/project/linearized-musicxml)
+![Python Version](https://badgen.net/badge/python/3.8+/cyan)
+
+<div align="center">
+    <br/>
+    <img src="docs/assets/lmx-logo.svg" width="400px">
+    <br/>
+    <br/>
+    <br/>
+</div>
+
 A python package for linearizing and de-linearizing MusicXML into a sequential format so that it can be used for training img2seq machine learning models.
 
 Install via:
