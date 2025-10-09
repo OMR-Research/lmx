@@ -34,6 +34,14 @@ python3 -m lmx delinearize example.lmx # produces example.musicxml
 cat example.lmx | python3 -m lmx delinearize - # prints to stdout
 ```
 
+## Documentation
+
+- [Design process notes](docs/design-process-notes/design-process-notes.md)
+    - [Reference documentation](docs/design-process-notes/design-process-notes.md#reference-documentation)
+    - [Pseudo grammar](docs/design-process-notes/design-process-notes.md#pseudo-grammar)
+    - [MusicXML element reference](docs/design-process-notes/design-process-notes.md#musicxml-element-reference-with-implementation-notes)
+
+
 ## Acknowledgement
 
 This package uses code first developed for an ICDAR 2024 paper by Mayer et al. See the acknowledgement there: https://github.com/ufal/olimpic-icdar24
