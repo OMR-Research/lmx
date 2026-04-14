@@ -2,28 +2,30 @@ from pathlib import Path
 import zipfile
 
 
-def load_musicxml_string(path_without_suffix: Path) -> str:
-    """Loads MusicXML as string from compressed and uncompressed
-    MusicXML files with various extensions (xml, musicxml, mxl)."""
-    for suffix in [".xml", ".musicxml", ".mxl"]:
-        path = path_without_suffix.with_suffix(suffix)
-        if path.exists():
-            break
-    if not path.exists():
-        raise Exception("Cannot find MusicXML file.")
+def read_musicxml_string_from_file(
+        file_path: Path | str
+) -> str:
+    """Reads the given .musicxml, .xml, or .mxl file and returns
+    the string representation of its MusicXML content.
+    The compressed file variant is automatically deflated.
+    """
+    file_path = Path(file_path)
 
-    # load compressed file
-    if path.suffix == ".mxl":
-        return _load_mxl(path)
+    if not file_path.exists():
+        raise Exception(f"Cannot find MusicXML file at {file_path}")
+
+    # read compressed file
+    if file_path.suffix == ".mxl":
+        return _read_mxl(file_path)
     
-    # load uncompressed file
-    with open(path, "r") as f:
+    # read uncompressed file
+    with open(file_path, "r") as f:
         return f.read()
 
 
-def _load_mxl(path: Path) -> str:
+def _read_mxl(file_path: Path) -> str:
     # open the zip archive
-    with zipfile.ZipFile(path, "r") as archive:
+    with zipfile.ZipFile(file_path, "r") as archive:
         # find the inner_file_name with the XML data
         for record in archive.infolist():
             # skip META-INF folder contents

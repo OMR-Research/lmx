@@ -1,5 +1,6 @@
 from pathlib import Path
 import xml.etree.ElementTree as ET
+from .serialize_musicxml_tree_to_string import serialize_musicxml_tree_to_string
 
 
 def write_musicxml_tree_to_file(
@@ -11,11 +12,7 @@ def write_musicxml_tree_to_file(
     if make_parent_folder:
         Path(str(file_path)).parent.mkdir(exist_ok=True, parents=True)
     
-    musicxml_string = str(ET.tostring(
-        musicxml_tree.getroot(),
-        encoding="utf-8",
-        xml_declaration=True
-    ), "utf-8")
+    musicxml_string = serialize_musicxml_tree_to_string(musicxml_tree)
 
     with open(file_path, "w") as file:
         file.write(musicxml_string)

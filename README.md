@@ -66,18 +66,27 @@ Install via:
 pip3 install linearized-musicxml
 ```
 
-Use from the command line:
+This registers a CLI called `lmx` that now can be used:
 
 ```bash
-# MusicXML -> LMX (accepts both XML and MXL)
-python3 -m lmx linearize example.musicxml # produces example.lmx
-python3 -m lmx linearize example.mxl # produces example.lmx
-cat example.musicxml | python3 -m lmx linearize - # prints to stdout (only uncompressed XML input)
+# MusicXML -> LMX (accepts both .musicxml and .mxl)
+lmx encode --input gold.musicxml --output gold.lmx
+lmx encode --input gold.mxl # prints to standard output
+cat gold.musicxml | lmx encode # also prints to stdout
 
-# LMX -> MusicXML (only uncompressed XML output available)
-python3 -m lmx delinearize example.lmx # produces example.musicxml
-cat example.lmx | python3 -m lmx delinearize - # prints to stdout
+# LMX -> MusicXML (only uncompressed MusicXML output available)
+lmx decode --input prediction.lmx --output prediction.musicxml
+lmx decode --input prediction.lmx # prints to standard output
+cat prediction.lmx | lmx decode # also prints to stdout
 ```
+
+The CLI can also be called this way:
+
+```bash
+python3 -m lmx [arguments...]
+```
+
+TODO: how to use from python?
 
 
 ## Documentation

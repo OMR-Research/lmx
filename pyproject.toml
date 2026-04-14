@@ -25,3 +25,6 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/OMR-Research/lmx"
 Issues = "https://github.com/OMR-Research/lmx/issues"
+
+[project.gui-scripts]
+lmx = "lmx.cli.run:run"
