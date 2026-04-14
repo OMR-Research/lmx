@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 class Pruner:
     """Prunes unimportant attributes and elements from MusicXML so that
     XML equality comparison can be utilized during when comparing with
-    delinearized XML; It ignores elements that TEDn ignores and attributes
+    decoded XML; It ignores elements that TEDn ignores and attributes
     that are relevant to layout, not content."""
 
     def __init__(

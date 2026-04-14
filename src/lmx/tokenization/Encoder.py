@@ -22,13 +22,14 @@ IGNORED_ATTRIBUTES_ELEMENTS = set([
 # use self._error, so that the code works fine with slightly unexpected input
 
 
-class Linearizer:
+class Encoder:
+    """Encodes MusicXML into LMX tokens"""
     def __init__(self, errout: Optional[TextIO] = None, fail_on_unknown_tokens=True):
         self._errout = errout or io.StringIO()
         """Print errors and warnings here"""
 
         self.output_tokens: List[str] = []
-        """The output linearized sequence, split up into tokens"""
+        """The output encoded sequence, split up into tokens"""
 
         self.fail_on_unknown_tokens = fail_on_unknown_tokens
         
@@ -257,7 +258,7 @@ class Linearizer:
             duration = int(duration_element.text)
             assert duration > 0
 
-        # check assumptions about the linearization process
+        # check assumptions about the encoding process
         self._verify_note_duration(duration, note, measure, is_measure_rest, is_grace_note)
         self._verify_chords(duration, pitch_token, is_chord, note, measure)
 

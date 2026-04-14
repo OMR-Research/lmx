@@ -39,11 +39,11 @@ delinearize_parser.add_argument(
 # Implementations #
 ###################
 
-from .linearization.Linearizer import Linearizer
-from .linearization.Delinearizer import Delinearizer
-from .symbolic.MxlFile import MxlFile
+from .tokenization.Encoder import Encoder
+from .tokenization.Decoder import Decoder
+from .musicxml.MxlFile import MxlFile
 import xml.etree.ElementTree as ET
-from .symbolic.part_to_score import part_to_score
+from .musicxml.part_to_score import part_to_score
 
 
 def linearize(filename: str):
@@ -70,11 +70,11 @@ def linearize(filename: str):
         print("No <part> element found.", file=sys.stderr)
         exit()
     
-    linearizer = Linearizer(
+    encoder = Encoder(
         errout=sys.stderr
     )
-    linearizer.process_part(part)
-    output_lmx = " ".join(linearizer.output_tokens)
+    encoder.process_part(part)
+    output_lmx = " ".join(encoder.output_tokens)
     
     if filename == "-":
         print(output_lmx)
@@ -90,11 +90,11 @@ def delinearize(filename: str):
         with open(filename, "r") as f:
             input_lmx = f.read()
 
-    delinearizer = Delinearizer(
+    decoder = Decoder(
         errout=sys.stderr
     )
-    delinearizer.process_text(input_lmx)
-    score_etree = part_to_score(delinearizer.part_element)
+    decoder.process_text(input_lmx)
+    score_etree = part_to_score(decoder.part_element)
     output_xml = str(ET.tostring(
         score_etree.getroot(),
         encoding="utf-8",
