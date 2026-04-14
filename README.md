@@ -13,7 +13,52 @@
     <br/>
 </div>
 
-A python package for linearizing and de-linearizing MusicXML into a sequential format so that it can be used for training img2seq machine learning models.
+> **🚨 `v2-development` branch:** This branch is where the v2.0.0 of the LMX package is being developed.
+
+The ultimate, zero-dependency toolkit for image-to-sequence models and MusicXML.
+
+Provides:
+
+- **Robust tokenization of MusicXML (encoding & decoding)**
+- Utilities for reading and manipulating MusicXML documents
+
+What it looks like:
+
+```xml
+<!-- This MusicXML: -->
+<measure>
+    ...
+    <note>
+        <pitch>
+            <step>C</step>
+            <alter>1</alter>
+            <octave>4</aoctave>
+        </pitch>
+        <duration>15</duration>
+        <voice>1</voice>
+        <type>eighth</duration>
+        <stem>up</stem>
+        <staff>1</staff>
+        <beam number="1">end</beam>
+    </note>
+    <backup>
+        <duration>120</duration>
+    </backup>
+    ...
+</measure>
+
+<!-- Corresponds to these LMX tokens: -->
+measure
+    ...
+    C4 voice:1 eighth stem:up staff:1 beam:end
+    backup whole
+    ...
+
+<!-- (whitespace separates tokens) -->
+```
+
+
+## Usage
 
 Install via:
 
@@ -34,6 +79,7 @@ python3 -m lmx delinearize example.lmx # produces example.musicxml
 cat example.lmx | python3 -m lmx delinearize - # prints to stdout
 ```
 
+
 ## Documentation
 
 - [Design process notes](docs/design-process-notes/design-process-notes.md)
@@ -44,4 +90,8 @@ cat example.lmx | python3 -m lmx delinearize - # prints to stdout
 
 ## Acknowledgement
 
-This package uses code first developed for an ICDAR 2024 paper by Mayer et al. See the acknowledgement there: https://github.com/ufal/olimpic-icdar24
+This package is derived from code first developed for an ICDAR 2024 paper by Mayer et al. If you use it for your research, please cite this paper:
+
+Jiří Mayer, Milan Straka, Jan Hajič jr., Pavel Pecina. Practical End-to-End Optical Music Recognition for Pianoform Music. 18th International Conference on Document Analysis and Recognition, ICDAR 2024. Athens, Greece, August 30 - September 4, pp. 55-73, 2024.
+**DOI:** https://doi.org/10.1007/978-3-031-70552-6_4
+**GitHub:** https://github.com/ufal/olimpic-icdar24
