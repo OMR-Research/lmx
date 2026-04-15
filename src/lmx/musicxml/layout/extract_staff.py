@@ -1,19 +1,22 @@
 from .MusicXmlLayoutMap import MusicXmlLayoutMap, StaffLocation
 import xml.etree.ElementTree as ET
-from .get_part_system_from_mxl_document import get_part_system_from_mxl_document
-from .split_piano_part_staves import split_piano_part_staves
+from .extract_part_system import extract_part_system
+from ..grandstaff.unzip_grandstaff import unzip_grandstaff
 import copy
 
 
-def crop_mxl_solo_staff(
+def extract_staff(
         layout_map: MusicXmlLayoutMap,
         staff_location: StaffLocation
 ) -> ET.ElementTree:
-    """Crops a solo staff out of a MusicXML document given its location"""
+    """
+    Extracts out a solo staff from a MusicXML document
+    given the staff's location
+    """
 
     # get the part and slice
     source_part = layout_map.parts[staff_location.part_index]
-    source_slice = get_part_system_from_mxl_document(
+    source_slice = extract_part_system(
         layout_map=layout_map,
         part_index=staff_location.part_index,
         page_index=staff_location.page_index,
@@ -28,7 +31,7 @@ def crop_mxl_solo_staff(
     if source_part.staff_count == 1:
         output_part_element = source_slice
     elif source_part.staff_count == 2:
-        upper_slice, lower_slice = split_piano_part_staves(
+        upper_slice, lower_slice = unzip_grandstaff(
             source_slice,
             upper_part_id=source_part.id,
             lower_part_id=source_part.id,

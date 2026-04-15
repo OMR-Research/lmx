@@ -3,7 +3,7 @@ import copy
 from .MeasureAsTracks import MeasureAsTracks
 
 
-def merge_piano_part_staves(
+def zip_grandstaff(
         upper_part: ET.Element,
         lower_part: ET.Element,
         output_part_id: str

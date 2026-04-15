@@ -1,20 +1,23 @@
 from .MusicXmlLayoutMap import MusicXmlLayoutMap
 import xml.etree.ElementTree as ET
-from .get_part_system_from_mxl_document import get_part_system_from_mxl_document
+from .extract_part_system import extract_part_system
 import copy
 
 
-def crop_mxl_system(
+def extract_system(
         layout_map: MusicXmlLayoutMap,
         page_index: int,
         page_system_index: int
 ) -> ET.ElementTree:
-    """Crops a system out of a MusicXML document given its location"""
+    """
+    Extracts a system (with all parts) out of
+    a MusicXML document given the system's location
+    """
     
     # === separate out the part-system for each part ===
 
     part_systems = [
-        get_part_system_from_mxl_document(
+        extract_part_system(
             layout_map=layout_map,
             part_index=part_index,
             page_index=page_index,

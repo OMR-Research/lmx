@@ -1,17 +1,19 @@
 from .MusicXmlLayoutMap import MusicXmlLayoutMap
 import xml.etree.ElementTree as ET
-from lmx.symbolic.split_part_to_systems import split_part_to_systems, \
+from ..split_part_to_systems import split_part_to_systems, \
     Page, System
 
 
-def get_part_system_from_mxl_document(
+def extract_part_system(
         layout_map: MusicXmlLayoutMap,
         part_index: int,
         page_index: int,
         page_system_index: int
 ) -> ET.Element:
-    """Slices out one part-system out of a given `<part>` and
-    returns it as a `<part>`."""
+    """
+    Extracts out one part-system out of a given `<part>`
+    of a MusicXML document and returns it as a new `<part>`.
+    """
     source_part = layout_map.parts[part_index]
 
     # split the source part into pages and systems

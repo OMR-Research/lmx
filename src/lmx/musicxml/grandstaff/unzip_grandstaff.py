@@ -26,7 +26,7 @@ class ContainsTruePianoformMusicException(Exception):
             "Details: " + self.message + " " + repr(self.metadata)
 
 
-def split_piano_part_staves(
+def unzip_grandstaff(
         piano_part: ET.Element,
         upper_part_id: str,
         lower_part_id: str,
