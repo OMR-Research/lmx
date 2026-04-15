@@ -1,7 +1,7 @@
 from .MusicXmlLayoutMap import MusicXmlLayoutMap
 import xml.etree.ElementTree as ET
-from ..split_part_to_systems import split_part_to_systems, \
-    Page, System
+from ..slice_part_to_systems import slice_part_to_systems, \
+    PageSlice, SystemSlice
 
 
 def extract_part_system(
@@ -18,8 +18,8 @@ def extract_part_system(
 
     # split the source part into pages and systems
     # and get the slice we're interested in
-    pages: list[Page] = split_part_to_systems(
-        part=source_part.part_element,
+    pages: list[PageSlice] = slice_part_to_systems(
+        part_element=source_part.part_element,
         emit_attributes_header=True,
         attributes_to_emit=["divisions", "key", "staves", "clef"],
         remove_page_and_system_breaks=True
@@ -31,5 +31,5 @@ def extract_part_system(
         page_index
     )
 
-    system: System = page.systems[page_system_index]
+    system: SystemSlice = page.systems[page_system_index]
     return system.part

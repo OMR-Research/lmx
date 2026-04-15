@@ -3,10 +3,14 @@ from typing import List, Optional, TextIO, Set
 from .vocabulary import *
 import io
 from fractions import Fraction
-from ..musicxml.PitchAlternator import PitchAlternator
-from ..musicxml.get_head_attributes import get_head_attributes
-from ..musicxml.sort_attributes import sort_attributes
-from ..musicxml.fractional_durations_to_actual import fractional_durations_to_actual
+from ..musicxml.pitch.PitchAlternator \
+    import PitchAlternator
+from ..musicxml.attributes.get_head_attributes \
+    import get_head_attributes
+from ..musicxml.attributes.sort_attributes \
+    import sort_attributes
+from ..musicxml.duration.fractional_durations_to_actual \
+    import fractional_durations_to_actual
 
 
 MEASURE_ITEM_ROOTS = set([

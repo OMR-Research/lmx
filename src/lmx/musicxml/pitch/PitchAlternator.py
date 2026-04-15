@@ -5,9 +5,12 @@ import copy
 
 
 class PitchAlternator:
-    """Updates the <alter> pitch tag to match the key signature and accidentals."""
+    """
+    Updates the <alter> pitch tag to match
+    the key signature and accidentals.
+    """
 
-    def __init__(self):
+    def __init__(self) -> None:
         # part-scoped state
         self._key_signature: int = 0
         self._measure_number = 0
