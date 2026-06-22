@@ -97,6 +97,37 @@ TODO: how to use from python?
     - [MusicXML element reference](docs/design-process-notes/design-process-notes.md#musicxml-element-reference-with-implementation-notes)
 
 
+## Development
+
+To develop this library, create a venv, install it with `[dev]` dependencies (mainly `pytest`) and run the command or unit tests to validate your modifications:
+
+```bash
+# clone the repo and enter it
+git clone git@github.com:OMR-Research/lmx.git
+cd lmx
+
+# create virtual environment
+python3 -m venv .venv
+
+# install the package into the venv via a symlink
+.venv/bin/pip3 install -e .
+
+# install also development utils (pytest)
+.venv/bin/pip3 install -e '.[dev]'
+
+# now you can play around with the command
+.venv/bin/lmx --help
+
+# or run unit tests
+.venv/bin/pytest
+
+# (or activate the venv so that you don't have to type '.venv/bin/')
+source .venv/bin/activate
+lmx --help
+pytest
+```
+
+
 ## Acknowledgement
 
 This package is derived from code first developed for an ICDAR 2024 paper by Mayer et al. If you use it for your research, please cite this paper:

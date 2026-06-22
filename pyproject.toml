@@ -11,6 +11,17 @@ version = "2.0.0-alpha1"
 authors = [
   { name="Jiří Mayer", email="mayer@ufal.mff.cuni.cz" },
 ]
+dependencies = [
+    # KEEP THIS EMPTY!
+    # There is no reason this light-weight package should
+    # depend on anything. Any unnecessary dependency
+    # adds potencial problems to package users.
+    #
+    # If you're adding niche functionality that requires dependencies,
+    # list them in a [project.optional-dependencies] section
+    # and document that your feature needs this extra dependency
+    # installed: pip3 install linearized-musicxml[my-optional-deps]
+]
 description = "Tokenizer for MusicXML and image-to-sequence models."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -20,6 +31,11 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
 ]
 
 [project.urls]
