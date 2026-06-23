@@ -1,0 +1,6 @@
+measure
+  clef:G2 staff:1
+  clef:F4 staff:2
+  G4 voice:1 whole staff:1
+  backup whole
+  F3 voice:5 whole staff:2
