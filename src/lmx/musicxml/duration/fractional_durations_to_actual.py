@@ -36,10 +36,13 @@ def fractional_durations_to_actual(part_element: ET.Element):
     denominators = [v.denominator for v in duration_values]
     
     # LCM magic algorithm (lowest common denominator)
-    lcm = denominators[0]
-    for denominator in denominators[1:]:
-        lcm = lcm // math.gcd(lcm, denominator) * denominator
-    divisions: int = lcm
+    if len(denominators) > 0:
+        lcm = denominators[0]
+        for denominator in denominators[1:]:
+            lcm = lcm // math.gcd(lcm, denominator) * denominator
+        divisions: int = lcm
+    else: # there are only measure rests in the score (no durations)
+        divisions: int = 1
 
     # write divisions element
     first_measure_element = part_element[0]
