@@ -14,5 +14,5 @@ def write_musicxml_tree_to_file(
     
     musicxml_string = serialize_musicxml_tree_to_string(musicxml_tree)
 
-    with open(file_path, "w") as file:
+    with open(file_path, "w", encoding="utf-8") as file:
         file.write(musicxml_string)

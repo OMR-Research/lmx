@@ -19,7 +19,7 @@ def read_musicxml_string_from_file(
         return _read_mxl(file_path)
     
     # read uncompressed file
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         return f.read()
 
 
