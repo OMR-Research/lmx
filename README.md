@@ -91,10 +91,14 @@ TODO: how to use from python?
 
 ## Documentation
 
-- [Design process notes](docs/design-process-notes/design-process-notes.md)
-    - [Reference documentation](docs/design-process-notes/design-process-notes.md#reference-documentation)
-    - [Pseudo grammar](docs/design-process-notes/design-process-notes.md#pseudo-grammar)
-    - [MusicXML element reference](docs/design-process-notes/design-process-notes.md#musicxml-element-reference-with-implementation-notes)
+- Tokenization
+    - [Design process notes](docs/design-process-notes/design-process-notes.md)
+        - [Reference documentation](docs/design-process-notes/design-process-notes.md#reference-documentation)
+        - [Pseudo grammar](docs/design-process-notes/design-process-notes.md#pseudo-grammar)
+        - [MusicXML element reference](docs/design-process-notes/design-process-notes.md#musicxml-element-reference-with-implementation-notes)
+- MusicXML utilities
+    - Reading and writing MusicXML files (TODO: `lmx.musicxml.io` module)
+    - [Omitted staff header normalization](docs/omitted-staff-header-normalization/omitted-staff-header-normalization.md)
 
 
 ## Development
