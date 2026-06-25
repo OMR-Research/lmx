@@ -3,13 +3,10 @@ from lmx.musicxml.io.read_musicxml_tree_from_file \
     import read_musicxml_tree_from_file
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from lmx.musicxml.omitted_staff_header \
-    import normalize_invisible_header_clef, Clef, ClefSign
-
-
-F_CLEF = Clef(sign=ClefSign.F, line=4)
-G_CLEF = Clef(sign=ClefSign.G, line=2)
-C_CLEF = Clef(sign=ClefSign.C, line=3)
+from lmx.musicxml.omitted_staff_header.normalize_invisible_header_clef \
+    import normalize_invisible_header_clef
+from lmx.musicxml.omitted_staff_header.Clef \
+    import Clef, G_CLEF, F_CLEF, C_CLEF
 
 
 def load_part(sample_name: str) -> ET.Element:
@@ -97,3 +94,5 @@ class TestClefOmissionNormalization:
     # - exception
     # - normalize
     # - do nothing
+
+    # TODO: test exception on new invisible clef
