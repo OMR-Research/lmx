@@ -44,7 +44,9 @@ def normalize_invisible_header_clef(
         specify desired clefs to be [G, F].
     :param when_clef_visible: Specifies how to behave, when the
         header clef is visible (which is unexpected). Select behaviour
-        that best matches your usecase.
+        that best matches your usecase. This behaviour affects only
+        those staves, that contain a visible header clef. Other staves
+        are processed as usual.
     """
 
     # create a copy of the input before we start modifying it
@@ -107,7 +109,30 @@ def normalize_invisible_header_clef(
     }
 
     # check that header clefs are invisible and if not, handle that
-    # TODO ...
+    for staff_number, clef_element in list(
+        header_clef_elements.items() # memorize since it may be edited in-loop
+    ):
+        if Clef.is_element_visible(clef_element):
+            if when_clef_visible == "raise-exception":
+                raise ValueError(
+                    f"The header clef for staff {staff_number} is visible, " +
+                    "but this method expects header clefs to be invisible."
+                )
+            elif when_clef_visible == "normalize-keep-visible":
+                Clef.set_clef_element_visibility(clef_element, "visible")
+            elif when_clef_visible == "normalize-set-invisible":
+                Clef.set_clef_element_visibility(clef_element, "invisible")
+            elif when_clef_visible == "dont-normalize":
+                # pretend the staff does not exist to ignore it
+                # in the processing below
+                del header_clef_elements[staff_number]
+                del original_header_clefs[staff_number]
+                del target_header_clefs[staff_number]
+            else:
+                raise ValueError(
+                    f"Unsupported option value for handling visible " +
+                    f"header clefs: {repr(when_clef_visible)}"
+                )
     
     ##############################
     # Phase 1 - get onset ranges #
@@ -116,6 +141,8 @@ def normalize_invisible_header_clef(
     # staff number -> part onset
     # The first onset, where a (visible) clef change occurs, for each staff
     # (not specified if no clef change exists for the staff)
+    # (may contain more staff number values than dictionaries above,
+    # since this one is computed from part content, not part header atttributes)
     clef_change_onset: dict[int, int] = {}
 
     # track onset relative to the start of the part
@@ -159,8 +186,7 @@ def normalize_invisible_header_clef(
 
     for staff_number in original_header_clefs.keys():
         target_header_clefs[staff_number].populate_clef_element(
-            header_clef_elements[staff_number],
-            set_visibility="invisible" # ensure invisible (TODO respect args)
+            header_clef_elements[staff_number]
         )
     
     ###############################
@@ -173,7 +199,7 @@ def normalize_invisible_header_clef(
             part_onset: int,
             staff_number: int
     ) -> Pitch:
-        nonlocal clef_change_onset
+        nonlocal clef_change_onset, original_header_clefs, target_header_clefs
 
         # no mapping after a clef change
         if part_onset >= clef_change_onset.get(staff_number, float("inf")):

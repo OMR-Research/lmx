@@ -54,20 +54,25 @@ class Clef:
             line=cast(ClefLine, line),
             octave_change=octave_change,
         )
+    
+    @staticmethod
+    def set_clef_element_visibility(
+            clef_element: ET.Element,
+            set_visibility: Literal["visible", "invisible"]
+    ):
+        """Sets the visibility option for the `<clef>` element,
+        specifically sets or removes the print-object XML attribute"""
+        if set_visibility == "visible":
+            clef_element.attrib.pop("print-object", None) # is ok if key missing
+        elif set_visibility == "invisible":
+            clef_element.attrib["print-object"] = "no"
 
     def populate_clef_element(
             self,
             clef_element: ET.Element,
-            set_visibility: Literal["visible", "invisible"]
     ):
         """Adjusts content of a given `<clef>` element
         to match the represented clef"""
-
-        # adjust <clef> visibility
-        if set_visibility == "visible":
-            del clef_element.attrib["print-object"]
-        elif set_visibility == "invisible":
-            clef_element.attrib["print-object"] = "no"
 
         # sign
         sign_element = clef_element.find("sign")

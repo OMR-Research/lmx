@@ -7,6 +7,8 @@ from lmx.musicxml.omitted_staff_header.normalize_invisible_header_clef \
     import normalize_invisible_header_clef
 from lmx.musicxml.omitted_staff_header.Clef \
     import Clef, G_CLEF, F_CLEF, C_CLEF
+from typing import Literal
+import pytest
 
 
 def load_part(sample_name: str) -> ET.Element:
@@ -16,18 +18,31 @@ def load_part(sample_name: str) -> ET.Element:
     return musicxml_tree.find("part")
 
 
-def normalize(given_sample: str, desired_clef: Clef, expected_sample: str):
+def normalize(
+        given_sample: str,
+        desired_clef: Clef,
+        expected_sample: str,
+        when_clef_visible: Literal[
+            "dont-normalize", "normalize-keep-visible",
+            "normalize-set-invisible", "raise-exception"
+        ] = "raise-exception",
+):
     assert_xml_equals(
         given=normalize_invisible_header_clef(
             part_element=load_part(given_sample),
             desired_clef=desired_clef,
-            when_clef_visible="raise-exception",
+            when_clef_visible=when_clef_visible,
         ),
         expected=load_part(expected_sample)
     )
 
 
 class TestClefOmissionNormalization:
+
+    ######################
+    # Ordinary behaviour #
+    ######################
+
     def test_plain_note_transposition(self):
         normalize("g-clef-octave", F_CLEF, "f-clef-octave")
         normalize("g-clef-octave", C_CLEF, "c-clef-octave")
@@ -88,11 +103,71 @@ class TestClefOmissionNormalization:
             "cc-piano-with-changes"
         )
 
-    # TODO: test header visibility forcing (setting)
+    ##############################
+    # Unexpected input behaviour #
+    ##############################
 
-    # TODO: test behavior with unexpected visible clefs
-    # - exception
-    # - normalize
-    # - do nothing
+    def test_normalizing_visible_clef_should_not_normalize(self):
+        normalize(
+            "g-clef-octave-visible",
+            F_CLEF,
+            "g-clef-octave-visible",
+            when_clef_visible="dont-normalize"
+        )
+        normalize(
+            "cf-piano-octave-visible-c",
+            [G_CLEF, F_CLEF],
+            "cf-piano-octave-visible-c",
+            when_clef_visible="dont-normalize"
+        )
+    
+    def test_normalizing_visible_clef_should_keep_visible(self):
+        normalize(
+            "g-clef-octave-visible",
+            F_CLEF,
+            "f-clef-octave-visible",
+            when_clef_visible="normalize-keep-visible"
+        )
+        normalize(
+            "cf-piano-octave-visible-c",
+            [G_CLEF, F_CLEF],
+            "gf-piano-octave-visible-g",
+            when_clef_visible="normalize-keep-visible"
+        )
+    
+    def test_normalizing_visible_clef_should_set_invisible(self):
+        normalize(
+            "g-clef-octave-visible",
+            F_CLEF,
+            "f-clef-octave",
+            when_clef_visible="normalize-set-invisible"
+        )
+        normalize(
+            "cf-piano-octave-visible-c",
+            [G_CLEF, F_CLEF],
+            "gf-piano-octave",
+            when_clef_visible="normalize-set-invisible"
+        )
+    
+    def test_normalizing_visible_clef_should_raise(self):
+        with pytest.raises(ValueError, match="this method expects header clefs to be invisible"):
+            normalize_invisible_header_clef(
+                part_element=load_part("g-clef-octave-visible"),
+                desired_clef=F_CLEF,
+                when_clef_visible="raise-exception",
+            )
+        
+        with pytest.raises(ValueError, match="this method expects header clefs to be invisible"):
+            normalize_invisible_header_clef(
+                part_element=load_part("cf-piano-octave-visible-c"),
+                desired_clef=[G_CLEF, F_CLEF],
+                when_clef_visible="raise-exception",
+            )
 
-    # TODO: test exception on new invisible clef
+    def test_normalization_raises_on_invisible_clef_change(self):
+        with pytest.raises(ValueError, match="Invisible clefs are only allowed at onset 0"):
+            normalize_invisible_header_clef(
+                part_element=load_part("g-clef-with-invisible-change"),
+                desired_clef=F_CLEF,
+                when_clef_visible="raise-exception",
+            )
