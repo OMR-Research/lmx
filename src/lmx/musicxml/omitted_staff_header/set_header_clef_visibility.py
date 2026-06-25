@@ -33,6 +33,6 @@ def set_header_clef_visibility(
 
         # set clef's visibility
         if set_visibility == "visible":
-            del clef_element.attrib["print-object"]
+            clef_element.attrib.pop("print-object", None) # ok if missing
         elif set_visibility == "invisible":
             clef_element.attrib["print-object"] = "no"
