@@ -40,6 +40,9 @@ def test_duration_may_be_added_to_onset():
     assert (onset + duration) == PartOnset(0, MeasureOnset(ActualDuration(6, 1)))
     assert (duration + onset) == PartOnset(0, MeasureOnset(ActualDuration(6, 1)))
 
+    onset += duration
+    assert onset == PartOnset(0, MeasureOnset(ActualDuration(6, 1)))
+
 def test_measure_index_may_be_advanced():
     onset = PartOnset(5, MeasureOnset(ActualDuration(2, 1)))
 

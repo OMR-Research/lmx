@@ -12,7 +12,7 @@ class FractionalDuration(Duration):
     value for representing duration.
     """
     
-    def __init__(self, value: Fraction | Rational | int):
+    def __init__(self, value: Fraction | Rational | int | str):
         self._value = Fraction(value)
     
     @property
@@ -79,3 +79,47 @@ class FractionalDuration(Duration):
         element = ET.Element("duration", {"fractional": "yes"})
         element.text = str(self.value)
         return element
+
+    @staticmethod
+    def from_actual_xml_element(
+        duration_element: ET.Element,
+        divisions: int
+    ) -> "FractionalDuration":
+        """Parses duration from an actual duration element.
+        Divisions must be extracted and provided as argument
+        as they are not part of the duration element."""
+        assert duration_element.tag == "duration"
+
+        raise NotImplementedError(
+            "Implement this when you refactor the conversion " +
+            "methods, since they will likely call this."
+        )
+
+    @staticmethod
+    def from_fractional_xml_element(
+        duration_element: ET.Element,
+    ) -> "FractionalDuration":
+        """Parses duration from an actual duration element.
+        Divisions must be extracted and provided as argument
+        as they are not part of the duration element."""
+        assert duration_element.tag == "duration"
+
+        if duration_element.attrib.get("fractional", "no") != "yes":
+            raise ValueError(
+                "Cannot parse fractional duration from actual element"
+            )
+        
+        if duration_element.text is None:
+            raise ValueError(
+                "Given duration element is missing content"
+            )
+        
+        value = Fraction(duration_element.text)
+        
+        if value <= 0:
+            raise ValueError(
+                "Given duration element has negative value, " +
+                "which is not allowed by the MusicXML standard"
+            )
+        
+        return FractionalDuration(value)

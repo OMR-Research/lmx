@@ -7,6 +7,8 @@ from .map_part_pitches import map_part_pitches
 from ..attributes.get_head_attributes import get_head_attributes
 from .transpose_pitch_given_clef_change \
     import transpose_pitch_given_clef_change
+from ..time.PartOnset import PartOnset
+from ..time.OnsetVisitor import OnsetVisitor
 
 
 def normalize_invisible_header_clef(
@@ -51,6 +53,11 @@ def normalize_invisible_header_clef(
 
     # create a copy of the input before we start modifying it
     part_element = copy.deepcopy(part_element)
+
+    # get the <divisions> value
+    divisions = int(
+        part_element.findtext("measure/attributes/divisions") or "1"
+    )
 
     # check that the input is not empty
     if len(part_element.findall("measure")) == 0:
@@ -143,42 +150,39 @@ def normalize_invisible_header_clef(
     # (not specified if no clef change exists for the staff)
     # (may contain more staff number values than dictionaries above,
     # since this one is computed from part content, not part header atttributes)
-    clef_change_onset: dict[int, int] = {}
+    clef_change_onset: dict[int, PartOnset] = {}
 
-    # track onset relative to the start of the part
-    part_onset = 0
+    class MyVisitor(OnsetVisitor):
+        def __init__(self):
+            nonlocal divisions
+            super().__init__(divisions=divisions, record_onsets=False)
+        
+        def visit_attributes(self, attributes_element: ET.Element):
+            nonlocal clef_change_onset, divisions
 
-    for measure_element in part_element.findall("measure"):
-        for child in measure_element:
+            # clef at onset 0 is not a clef change, skip
+            if self.part_onset == PartOnset.zero_actual(divisions):
+                return
             
-            # visit all <attributes>
-            if child.tag == "attributes":
-                # visit all <clef> elements
-                for clef_element in child.findall("clef"):
-                    staff_number = int(clef_element.get("number", "1"))
-                    
-                    # clef at onset 0 is not a clef change, skip
-                    if part_onset != 0:
+            # visit all <clef> elements
+            for clef_element in attributes_element.findall("clef"):
+                staff_number = int(clef_element.get("number", "1"))
+                
+                # check that this clef is visible
+                if not Clef.is_element_visible(clef_element):
+                    raise ValueError(
+                        f"The input <part> element contains an invisible " +
+                        f"clef at part onset of {self.part_onset}. Invisible " +
+                        f"clefs are only allowed at onset 0 (header clefs)."
+                    )
+                
+                # insert or decrease the currently known onset for the staff
+                if staff_number not in clef_change_onset:
+                    clef_change_onset[staff_number] = self.part_onset
+                elif self.part_onset < clef_change_onset[staff_number]:
+                    clef_change_onset[staff_number] = self.part_onset
 
-                        # check that this clef is visible
-                        if not Clef.is_element_visible(clef_element):
-                            raise ValueError(
-                                f"The input <part> element contains an invisible " +
-                                f"clef at part onset of {part_onset}. Invisible " +
-                                f"clefs are only allowed at onset 0 (header clefs)."
-                            )
-                        
-                        # insert or decrease the currently known onset for the staff
-                        if staff_number not in clef_change_onset:
-                            clef_change_onset[staff_number] = part_onset
-                        elif part_onset < clef_change_onset[staff_number]:
-                            clef_change_onset[staff_number] = part_onset
-
-            # update onset (always)
-            duration = int(child.findtext("duration", "0"))
-            if child.tag == "backup":
-                duration = -duration
-            part_onset += duration
+    MyVisitor().run(part_element)
     
     #################################
     # Phase 2 - change header clefs #
@@ -196,14 +200,15 @@ def normalize_invisible_header_clef(
     def pitch_mapper(
             note_element: ET.Element,
             pitch: Pitch,
-            part_onset: int,
+            part_onset: PartOnset,
             staff_number: int
     ) -> Pitch:
         nonlocal clef_change_onset, original_header_clefs, target_header_clefs
 
         # no mapping after a clef change
-        if part_onset >= clef_change_onset.get(staff_number, float("inf")):
-            return pitch
+        if staff_number in clef_change_onset:
+            if part_onset >= clef_change_onset[staff_number]:
+                return pitch
         
         # skip notes on staves for which there are no header clefs
         # (this signals a faulty MusicXML, but we silently let it pass)

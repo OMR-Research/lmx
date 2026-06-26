@@ -102,6 +102,7 @@ TODO: how to use from python?
     - Handling duration and onsets
         - Fractional durations
         - [`Onset` and `Duration` representations](docs/onset-and-duration-representations.md)
+        - [`OnsetVisitor` utility](docs/onset-visitor-utility.md)
 - MuseScore utilities
     - ...
 

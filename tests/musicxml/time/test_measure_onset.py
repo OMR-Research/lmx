@@ -34,6 +34,9 @@ def test_duration_may_be_added_to_onset():
     assert (onset + duration) == MeasureOnset(ActualDuration(6, 1))
     assert (duration + onset) == MeasureOnset(ActualDuration(6, 1))
 
+    onset += duration
+    assert onset == MeasureOnset(ActualDuration(6, 1))
+
 
 def test_two_onsets_may_not_be_added():
     a = MeasureOnset(ActualDuration(2, 1))

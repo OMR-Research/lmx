@@ -114,3 +114,36 @@ class ActualDuration(Duration):
         element = ET.Element("duration")
         element.text = str(self.value)
         return element
+    
+    @staticmethod
+    def from_xml_element(
+        duration_element: ET.Element,
+        divisions: int
+    ) -> "ActualDuration":
+        """Parses duration from a duration element.
+        Divisions must be extracted and provided as argument
+        as they are not part of the duration element."""
+        assert duration_element.tag == "duration"
+        
+        if duration_element.attrib.get("fractional", "no") == "yes":
+            raise ValueError(
+                "Cannot parse actual duration from fractional element"
+            )
+        
+        if duration_element.text is None:
+            raise ValueError(
+                "Given duration element is missing content"
+            )
+        
+        value = int(duration_element.text)
+        
+        if value <= 0:
+            raise ValueError(
+                "Given duration element has negative value, " +
+                "which is not allowed by the MusicXML standard"
+            )
+        
+        return ActualDuration(
+            value=value,
+            divisions=divisions,
+        )

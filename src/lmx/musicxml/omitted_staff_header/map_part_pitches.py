@@ -1,11 +1,13 @@
 import xml.etree.ElementTree as ET
 from .Pitch import Pitch
 from typing import Callable
+from ..time.PartOnset import PartOnset
+from ..time.OnsetVisitor import OnsetVisitor
 
 
 def map_part_pitches(
         part_element: ET.Element,
-        pitch_mapper: Callable[[ET.Element, Pitch, int, int], Pitch]
+        pitch_mapper: Callable[[ET.Element, Pitch, PartOnset, int], Pitch]
 ) -> None:
     """
     Utility functor that lets you adjust values of `<pitch>`
@@ -23,33 +25,33 @@ def map_part_pitches(
     """
     assert part_element.tag == "part", \
         "The given element is not a `<part>`"
+    
+    # get the <divisions> value
+    divisions = int(
+        part_element.findtext("measure/attributes/divisions") or "1"
+    )
 
-    # track onset relative to the start of the part
-    part_onset = 0
-
-    for measure_element in part_element.findall("measure"):
-        for child in measure_element:
-            
+    class MyVisitor(OnsetVisitor):
+        def __init__(self):
+            nonlocal divisions
+            super().__init__(divisions=divisions, record_onsets=False)
+        
+        def visit_note(self, note_element: ET.Element):
             # only `<note>` elements have pitches
             # (and skip those that don't)
-            if child.tag == "note":
-                note_element = child
-                pitch_element = child.find("pitch")
-                if pitch_element is not None:
+            pitch_element = note_element.find("pitch")
+            if pitch_element is None:
+                return
+            
+            # update pitch
+            staff_number = int(note_element.findtext("staff", "1"))
+            pitch = Pitch.from_pitch_element(pitch_element)
+            new_pitch = pitch_mapper(
+                note_element,
+                pitch,
+                self.part_onset,
+                staff_number
+            )
+            new_pitch.populate_pitch_element(pitch_element)
 
-                    # update pitch
-                    staff_number = int(note_element.findtext("staff", "1"))
-                    pitch = Pitch.from_pitch_element(pitch_element)
-                    new_pitch = pitch_mapper(
-                        note_element,
-                        pitch,
-                        part_onset,
-                        staff_number
-                    )
-                    new_pitch.populate_pitch_element(pitch_element)
-
-            # update onset (always)
-            duration = int(child.findtext("duration", "0"))
-            if child.tag == "backup":
-                duration = -duration
-            part_onset += duration
+    MyVisitor().run(part_element)
