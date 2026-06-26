@@ -2,6 +2,9 @@ import xml.etree.ElementTree as ET
 from fractions import Fraction
 
 
+# TODO: refactor to use the new value objects (Duration, MeasureOnset)
+
+
 def actual_durations_to_fractional(part_element: ET.Element):
     """
     Goes over the given `<part>` element's contents and replaces

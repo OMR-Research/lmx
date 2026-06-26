@@ -5,6 +5,9 @@ from ..attributes.get_head_attributes import get_head_attributes
 from ..attributes.sort_attributes import sort_attributes
 
 
+# TODO: refactor to use the new value objects (Duration, MeasureOnset)
+
+
 def fractional_durations_to_actual(part_element: ET.Element):
     """
     Accepts a `<part>` element with no `<divisions>` element

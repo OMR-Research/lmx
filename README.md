@@ -99,6 +99,11 @@ TODO: how to use from python?
 - MusicXML utilities
     - Reading and writing MusicXML files (TODO: `lmx.musicxml.io` module)
     - [Omitted staff header normalization](docs/omitted-staff-header-normalization/omitted-staff-header-normalization.md)
+    - Handling duration and onsets
+        - Fractional durations
+        - [`Onset` and `Duration` representations](docs/onset-and-duration-representations.md)
+- MuseScore utilities
+    - ...
 
 
 ## Development
