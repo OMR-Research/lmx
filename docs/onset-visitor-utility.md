@@ -27,12 +27,10 @@ import xml.etree.ElementTree as ET
 from lmx.musicxml.time.OnsetVisitor import OnsetVisitor
 
 part_element = load_part("my-sample.musicxml") # <part> ET.Element
-divisions = int(part_element.findtext("measure/attributes/divisions"))
 
 class MyVisitor(OnsetVisitor):
     def __init__(self):
-        nonlocal divisions
-        super().__init__(divisions=divisions, record_onsets=False)
+        super().__init__(record_onsets=False)
 
         self.note_count = 0
         self.attributes_count = 0
@@ -60,11 +58,9 @@ from lmx.musicxml.time.OnsetVisitor import OnsetVisitor
 
 # load MusicXML <part>
 part_element = load_part("my-sample.musicxml") # <part> ET.Element
-divisions = int(part_element.findtext("measure/attributes/divisions"))
 
 # run the visitor to record the onset tape
 visitor = OnsetVisitor(
-    divisions=divisions,
     record_onsets=True
 )
 visitor.run(part_element)

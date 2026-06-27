@@ -4,6 +4,8 @@ from .MeasureOnset import MeasureOnset
 from .ActualDuration import ActualDuration
 from .Duration import Duration
 from .FractionalDuration import FractionalDuration
+from .find_divisions import find_divisions
+from typing import Literal
 
 
 MEASURE_ELEMENT_CHILDREN: list[str] = [
@@ -16,29 +18,24 @@ MEASURE_ELEMENT_CHILDREN: list[str] = [
 
 
 class OnsetVisitor:
-    def __init__(self, divisions: int | None, record_onsets: bool):
+    def __init__(self, record_onsets: bool = True):
         """Creates a new onset visitor instance.
 
         The expected usecase is to create a child class and override
         needed visit_... methods, however, the provided onset recording
         logic may be useful on its own so this class is not abstract.
         
-        :param divisions: Divisions value to use for duration
-            and onset representation. If None, fractional duration
-            is used instead.
         :param record_onsets: Whether to remember measure child element
             onsets on the onset tape for later querying.
         """
 
-        self._divisions = divisions
-        """Divisions used for duration representation.
-        None means use fractional representation."""
-
         self._finished: bool = False
         """Has the visitor ran already and finished without throwing?"""
         
-        self._part_onset: PartOnset = PartOnset.zero(divisions)
-        """Backing field for the 'part_onset' to make it read-only"""
+        self._part_onset: PartOnset | None = None
+        """Backing field for the 'part_onset' to make it read-only,
+        is None before the visitor is run, because otherwise the proper
+        duration representation is not know yet."""
 
         self._chord_durations: list[Duration] = []
         """Tracks durations of notes in a chord to determine the
@@ -55,6 +52,11 @@ class OnsetVisitor:
     @property
     def part_onset(self) -> PartOnset:
         """Current onset within the `<part>`"""
+        if self._part_onset is None:
+            raise RuntimeError(
+                "Part onset may not be queried " +
+                "before the visitor starts running"
+            )
         return self._part_onset
     
     @property
@@ -100,8 +102,15 @@ class OnsetVisitor:
     def _advance_measure_onset(
             self,
             child_element: ET.Element,
-            look_ahead: ET.Element | None
+            look_ahead: ET.Element | None,
+            divisions: int | Literal["fractional"],
     ):
+        if self._part_onset is None:
+            raise RuntimeError(
+                "Part onset should not be None, make sure you " +
+                "run the visitor through the run(...) method."
+            )
+        
         # only these elements may contain <duration> element
         # https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/duration/
         if child_element.tag not in [
@@ -114,14 +123,14 @@ class OnsetVisitor:
             return # grace notes end up here
 
         # parse out the duration based on the selected representation
-        if self._divisions is None:
+        if divisions == "fractional":
             duration = FractionalDuration.from_fractional_xml_element(
                 duration_element
             )
         else:
             duration = ActualDuration.from_xml_element(
                 duration_element=duration_element,
-                divisions=self._divisions,
+                divisions=divisions,
             )
         
         # For <note> elements, onset is advanced only
@@ -170,8 +179,19 @@ class OnsetVisitor:
         # advance onset in any other case
         self._part_onset += duration
 
-    def run(self, element: ET.Element):
-        """Executes the visitor on given `<part>` or `<measure>`."""
+    def run(
+            self,
+            element: ET.Element,
+            divisions: int | Literal[
+                "fractional", "autoresolve"
+            ] = "autoresolve"
+    ):
+        """Executes the visitor on given `<part>` or `<measure>`.
+        
+        The `<divisions>` value is attempted to be autoresolved from the
+        given element, however, if the value is not present there,
+        make sure to provide it manually via the divisions argument.
+        """
         if element.tag not in ["measure", "part"]:
             raise ValueError(
                 "Visitor may be run only on <part> or <measure> elements."
@@ -180,11 +200,30 @@ class OnsetVisitor:
         if self._finished:
             raise RuntimeError("An OnsetVisitor can only be run once")
 
-        if element.tag == "part":
-            self.visit_part(element)
-        elif element.tag == "measure":
-            self.visit_measure(element)
+        # automatically resolve divisions value
+        if divisions == "autoresolve":
+            resolved_divisions = find_divisions(element)
+            if resolved_divisions is None:
+                raise ValueError(
+                    "Division autoresolution failed, " +
+                    "no <divisions> element was found."
+                )
+        else:
+            resolved_divisions = divisions
+        
+        # set onset to zero
+        if resolved_divisions == "fractional":
+            self._part_onset = PartOnset.zero_fractional()
+        else:
+            self._part_onset = PartOnset.zero_actual(resolved_divisions)
 
+        # run the visitor
+        if element.tag == "part":
+            self.visit_part(element, resolved_divisions)
+        elif element.tag == "measure":
+            self.visit_measure(element, resolved_divisions)
+
+        # done
         self._finished = True
     
     #############################################################
@@ -192,16 +231,30 @@ class OnsetVisitor:
     #############################################################
     # vvvv
     
-    def visit_part(self, part_element: ET.Element):
+    def visit_part(
+            self,
+            part_element: ET.Element,
+            divisions: int | Literal["fractional"]
+    ):
         assert part_element.tag == "part"
 
+        if self._part_onset is None:
+            raise RuntimeError(
+                "Part onset should not be None, make sure you " +
+                "run the visitor through the run(...) method."
+            )
+
         for measure_element in part_element:
-            self.visit_measure(measure_element)
+            self.visit_measure(measure_element, divisions)
 
             # advance onset
             self._part_onset = self._part_onset.next_measure()
 
-    def visit_measure(self, measure_element: ET.Element):
+    def visit_measure(
+            self,
+            measure_element: ET.Element,
+            divisions: int | Literal["fractional"],
+    ):
         assert measure_element.tag == "measure"
         
         for i, child_element in enumerate(measure_element):
@@ -215,7 +268,11 @@ class OnsetVisitor:
             # advance measure onset
             look_ahead = None if i >= len(measure_element) - 1 \
                 else measure_element[i + 1]
-            self._advance_measure_onset(child_element, look_ahead)
+            self._advance_measure_onset(
+                child_element,
+                look_ahead,
+                divisions
+            )
     
     def visit_measure_child(self, child_element: ET.Element):
         assert child_element.tag in MEASURE_ELEMENT_CHILDREN

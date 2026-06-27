@@ -4,6 +4,7 @@ from lmx.musicxml.time.OnsetVisitor import OnsetVisitor
 from lmx.musicxml.time.PartOnset import PartOnset
 from lmx.musicxml.time.MeasureOnset import MeasureOnset
 from lmx.musicxml.time.ActualDuration import ActualDuration
+from lmx.musicxml.time.find_divisions import find_divisions
 import xml.etree.ElementTree as ET
 from pathlib import Path
 import pytest
@@ -19,13 +20,11 @@ def load_part(sample_name: str) -> ET.Element:
 def test_onset_recording():
     # load input sample
     part_element = load_part("basic-sample")
-    divisions = int(part_element.findtext("measure/attributes/divisions"))
+    divisions = find_divisions(part_element)
+    assert divisions is not None
     
     # run the visitor
-    visitor = OnsetVisitor(
-        divisions=divisions,
-        record_onsets=True
-    )
+    visitor = OnsetVisitor(record_onsets=True)
     visitor.run(part_element)
 
     # locate key landmarks
@@ -56,7 +55,8 @@ def test_custom_visitor():
     
     # load input sample
     part_element = load_part("basic-sample")
-    divisions = int(part_element.findtext("measure/attributes/divisions"))
+    divisions = find_divisions(part_element)
+    assert divisions is not None
 
     # define threshold (middle of the second measure)
     onset_threshold = PartOnset(
@@ -67,8 +67,7 @@ def test_custom_visitor():
     # define custom visitor
     class MyVisitor(OnsetVisitor):
         def __init__(self):
-            nonlocal divisions
-            super().__init__(divisions=divisions, record_onsets=False)
+            super().__init__(record_onsets=False)
             
             self.notes_past_threshold = 0 # custom state (counter)
         

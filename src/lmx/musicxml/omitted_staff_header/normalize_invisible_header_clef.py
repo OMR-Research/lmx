@@ -9,6 +9,7 @@ from .transpose_pitch_given_clef_change \
     import transpose_pitch_given_clef_change
 from ..time.PartOnset import PartOnset
 from ..time.OnsetVisitor import OnsetVisitor
+from ..time.Duration import Duration
 
 
 def normalize_invisible_header_clef(
@@ -53,11 +54,6 @@ def normalize_invisible_header_clef(
 
     # create a copy of the input before we start modifying it
     part_element = copy.deepcopy(part_element)
-
-    # get the <divisions> value
-    divisions = int(
-        part_element.findtext("measure/attributes/divisions") or "1"
-    )
 
     # check that the input is not empty
     if len(part_element.findall("measure")) == 0:
@@ -154,14 +150,15 @@ def normalize_invisible_header_clef(
 
     class MyVisitor(OnsetVisitor):
         def __init__(self):
-            nonlocal divisions
-            super().__init__(divisions=divisions, record_onsets=False)
+            super().__init__(record_onsets=False)
         
         def visit_attributes(self, attributes_element: ET.Element):
-            nonlocal clef_change_onset, divisions
+            nonlocal clef_change_onset
 
             # clef at onset 0 is not a clef change, skip
-            if self.part_onset == PartOnset.zero_actual(divisions):
+            if self.part_onset.measure_onset.value == \
+                Duration.zero_of_type(self.part_onset.measure_onset.value) \
+                and self.part_onset.measure_index == 0:
                 return
             
             # visit all <clef> elements

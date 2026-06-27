@@ -26,15 +26,9 @@ def map_part_pitches(
     assert part_element.tag == "part", \
         "The given element is not a `<part>`"
     
-    # get the <divisions> value
-    divisions = int(
-        part_element.findtext("measure/attributes/divisions") or "1"
-    )
-
     class MyVisitor(OnsetVisitor):
         def __init__(self):
-            nonlocal divisions
-            super().__init__(divisions=divisions, record_onsets=False)
+            super().__init__(record_onsets=False)
         
         def visit_note(self, note_element: ET.Element):
             # only `<note>` elements have pitches
