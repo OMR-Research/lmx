@@ -38,10 +38,12 @@ class MeasureOnset:
             return MeasureOnset.zero_actual(divisions)
 
     def __post_init__(self):
-        if self.value < Duration.zero_of_type(self.value):
+        if self.value < 0:
             raise ValueError("Onset must be non-negative")
 
     def __eq__(self, other) -> bool:
+        if other == 0:
+            return self.value == 0
         if not isinstance(other, MeasureOnset):
             return NotImplemented
         return self.value == other.value
@@ -50,21 +52,29 @@ class MeasureOnset:
         return hash(self.value)
     
     def __lt__(self, other) -> bool:
+        if other == 0:
+            return self.value < 0
         if not isinstance(other, MeasureOnset):
             return NotImplemented
         return self.value < other.value
 
     def __le__(self, other) -> bool:
+        if other == 0:
+            return self.value <= 0
         if not isinstance(other, MeasureOnset):
             return NotImplemented
         return self.value <= other.value
 
     def __gt__(self, other) -> bool:
+        if other == 0:
+            return self.value > 0
         if not isinstance(other, MeasureOnset):
             return NotImplemented
         return self.value > other.value
 
     def __ge__(self, other) -> bool:
+        if other == 0:
+            return self.value >= 0
         if not isinstance(other, MeasureOnset):
             return NotImplemented
         return self.value >= other.value

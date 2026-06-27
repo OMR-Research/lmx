@@ -9,7 +9,6 @@ from .transpose_pitch_given_clef_change \
     import transpose_pitch_given_clef_change
 from ..time.PartOnset import PartOnset
 from ..time.OnsetVisitor import OnsetVisitor
-from ..time.Duration import Duration
 
 
 def normalize_invisible_header_clef(
@@ -156,9 +155,7 @@ def normalize_invisible_header_clef(
             nonlocal clef_change_onset
 
             # clef at onset 0 is not a clef change, skip
-            if self.part_onset.measure_onset.value == \
-                Duration.zero_of_type(self.part_onset.measure_onset.value) \
-                and self.part_onset.measure_index == 0:
+            if self.part_onset == 0:
                 return
             
             # visit all <clef> elements

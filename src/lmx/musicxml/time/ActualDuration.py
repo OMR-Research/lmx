@@ -30,6 +30,8 @@ class ActualDuration(Duration):
             raise ValueError("Actual duration must have positive divisions")
 
     def __eq__(self, other) -> bool:
+        if other == 0:
+            return self.value == 0
         if not isinstance(other, ActualDuration):
             return NotImplemented
         if self.divisions != other.divisions:
@@ -44,6 +46,8 @@ class ActualDuration(Duration):
         return hash(self.value)
 
     def __lt__(self, other) -> bool:
+        if other == 0:
+            return self.value < 0
         if not isinstance(other, ActualDuration):
             return NotImplemented
         if self.divisions != other.divisions:
@@ -53,6 +57,8 @@ class ActualDuration(Duration):
         return self.value < other.value
 
     def __le__(self, other) -> bool:
+        if other == 0:
+            return self.value <= 0
         if not isinstance(other, ActualDuration):
             return NotImplemented
         if self.divisions != other.divisions:
@@ -62,6 +68,8 @@ class ActualDuration(Duration):
         return self.value <= other.value
 
     def __gt__(self, other) -> bool:
+        if other == 0:
+            return self.value > 0
         if not isinstance(other, ActualDuration):
             return NotImplemented
         if self.divisions != other.divisions:
@@ -71,6 +79,8 @@ class ActualDuration(Duration):
         return self.value > other.value
 
     def __ge__(self, other) -> bool:
+        if other == 0:
+            return self.value >= 0
         if not isinstance(other, ActualDuration):
             return NotImplemented
         if self.divisions != other.divisions:

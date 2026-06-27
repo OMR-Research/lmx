@@ -62,3 +62,33 @@ def test_it_doesnt_support_int_operands():
     
     with pytest.raises(TypeError):
         a - 5
+
+    with pytest.raises(TypeError):
+        a > 5
+
+    with pytest.raises(TypeError):
+        a < 5
+
+    with pytest.raises(TypeError):
+        a >= 5
+    
+    with pytest.raises(TypeError):
+        a <= 5
+
+
+def test_it_may_be_compared_to_zero():
+    zero = MeasureOnset(ActualDuration(0, 1))
+    assert zero == 0
+    assert zero >= 0
+    assert zero <= 0
+    assert 0 == zero
+    assert 0 >= zero
+    assert 0 <= zero
+    
+    one = MeasureOnset(ActualDuration(1, 1))
+    assert one != 0
+    assert one > 0
+    assert one >= 0
+    assert 0 != one
+    assert 0 < one
+    assert 0 <= one

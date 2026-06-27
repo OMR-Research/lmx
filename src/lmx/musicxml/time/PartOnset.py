@@ -56,6 +56,8 @@ class PartOnset:
             raise ValueError("Measure index must be non-negative")
 
     def __eq__(self, other) -> bool:
+        if other == 0:
+            return self.measure_index == 0 and self.measure_onset == 0
         if not isinstance(other, PartOnset):
             return NotImplemented
         return self.measure_index == other.measure_index \
@@ -65,6 +67,10 @@ class PartOnset:
         return hash((self.measure_index, self.measure_onset))
     
     def __lt__(self, other) -> bool:
+        if other == 0:
+            if self.measure_index == 0:
+                return self.measure_onset < 0
+            return self.measure_index < 0
         if not isinstance(other, PartOnset):
             return NotImplemented
         if self.measure_index == other.measure_index:
@@ -72,6 +78,10 @@ class PartOnset:
         return self.measure_index < other.measure_index
 
     def __le__(self, other) -> bool:
+        if other == 0:
+            if self.measure_index == 0:
+                return self.measure_onset <= 0
+            return self.measure_index <= 0
         if not isinstance(other, PartOnset):
             return NotImplemented
         if self.measure_index == other.measure_index:
@@ -79,6 +89,10 @@ class PartOnset:
         return self.measure_index <= other.measure_index
 
     def __gt__(self, other) -> bool:
+        if other == 0:
+            if self.measure_index == 0:
+                return self.measure_onset > 0
+            return self.measure_index > 0
         if not isinstance(other, PartOnset):
             return NotImplemented
         if self.measure_index == other.measure_index:
@@ -86,6 +100,10 @@ class PartOnset:
         return self.measure_index > other.measure_index
 
     def __ge__(self, other) -> bool:
+        if other == 0:
+            if self.measure_index == 0:
+                return self.measure_onset >= 0
+            return self.measure_index >= 0
         if not isinstance(other, PartOnset):
             return NotImplemented
         if self.measure_index == other.measure_index:

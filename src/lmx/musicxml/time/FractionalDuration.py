@@ -28,6 +28,8 @@ class FractionalDuration(Duration):
         return FractionalDuration(0)
 
     def __eq__(self, other) -> bool:
+        if other == 0:
+            return self.value == 0
         if not isinstance(other, FractionalDuration):
             return NotImplemented
         return self.value == other.value
@@ -36,21 +38,29 @@ class FractionalDuration(Duration):
         return hash(self.value)
 
     def __lt__(self, other) -> bool:
+        if other == 0:
+            return self.value < 0
         if not isinstance(other, FractionalDuration):
             return NotImplemented
         return self.value < other.value
 
     def __le__(self, other) -> bool:
+        if other == 0:
+            return self.value <= 0
         if not isinstance(other, FractionalDuration):
             return NotImplemented
         return self.value <= other.value
 
     def __gt__(self, other) -> bool:
+        if other == 0:
+            return self.value > 0
         if not isinstance(other, FractionalDuration):
             return NotImplemented
         return self.value > other.value
 
     def __ge__(self, other) -> bool:
+        if other == 0:
+            return self.value >= 0
         if not isinstance(other, FractionalDuration):
             return NotImplemented
         return self.value >= other.value
