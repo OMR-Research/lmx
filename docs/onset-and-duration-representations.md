@@ -46,7 +46,7 @@ from lmx.musicxml.time.ActualDuration import ActualDuration
 half_note = ActualDuration(value=2, divisions=1)
 quarter_note = ActualDuration(value=1, divisions=1)
 
-assert half_note + half_note == quarter_note
+assert quarter_note + quarter_note == half_note
 ```
 
 Onset types also support arithmetics, but with different conditions:
