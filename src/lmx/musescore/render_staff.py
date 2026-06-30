@@ -18,7 +18,7 @@ def render_staff(
         output_png_file: Path | list[Path],
         render_invisible_attributes=False,
         dpi=300,
-        page_width_tenths=4000,
+        page_width_tenths=6000,
         print_musescore_output=False,
         print_tmpfolder_before_exitting=False,
 ):
@@ -226,9 +226,9 @@ def _prepare_part_as_musicxml_tree(
     # render invisible attributes in gray
     if render_invisible_attributes:
         for element in [
-            *musicxml_tree.findall("//clef"),
-            *musicxml_tree.findall("//key"),
-            *musicxml_tree.findall("//time")
+            *musicxml_tree.findall(".//clef"),
+            *musicxml_tree.findall(".//key"),
+            *musicxml_tree.findall(".//time")
         ]:
             if element.attrib.get("print-object", "yes") == "no":
                 del element.attrib["print-object"]
