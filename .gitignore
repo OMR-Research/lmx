@@ -1,8 +1,11 @@
 # Ignore editor config files.
 # Not ideal, things like ruler widths could be shared but this is a starting point.
 # See the paragraph about the .idea folder at the end of this file.
-.vscode/
-.idea/
+/.vscode/
+/.idea/
+
+# ignore locally installed MuseScore
+/musescore/
 
 
 # ============================================

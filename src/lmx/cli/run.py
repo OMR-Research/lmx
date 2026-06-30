@@ -48,6 +48,19 @@ lmx.cli.decode_command.define_parser(
 )
 root_command_handlers["decode"] = lmx.cli.decode_command.execute
 
+# === render staff ===
+
+import lmx.cli.render_staff_command
+lmx.cli.render_staff_command.define_parser(
+    subparsers.add_parser(
+        "render_staff",
+        aliases=[],
+        description=
+            "Renders a MusicXML staff via MuseScore to a B/W image"
+    )
+)
+root_command_handlers["render_staff"] = lmx.cli.render_staff_command.execute
+
 
 ######################
 # Execute the parser #
