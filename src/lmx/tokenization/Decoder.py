@@ -3,14 +3,13 @@ from typing import List, Optional, TextIO, Set
 from .vocabulary import *
 import io
 from fractions import Fraction
-from ..musicxml.pitch.PitchAlternator \
-    import PitchAlternator
 from ..musicxml.attributes.get_head_attributes \
     import get_head_attributes
 from ..musicxml.attributes.sort_attributes \
     import sort_attributes
 from ..musicxml.time.fractional_durations_to_actual \
     import fractional_durations_to_actual
+from ..musicxml.pitch.repair_alters import RepairAltersVisitor
 
 
 MEASURE_ITEM_ROOTS = set([
@@ -67,7 +66,7 @@ class Decoder:
         # within-part state
         self._fractional_measure_duration: Optional[Fraction] = None
         self._open_slur_count = 0
-        self._pitch_alternator = PitchAlternator()
+        self._repair_alters_visitor: RepairAltersVisitor | None = None
 
         # within-measure state
         self._stem_orientation: Optional[str] = None # "up", "down", None
@@ -84,11 +83,20 @@ class Decoder:
         # reset within-part state
         self._fractional_measure_duration = None
         self._open_slur_count = 0
-        self._pitch_alternator = PitchAlternator()
+        self._repair_alters_visitor = RepairAltersVisitor(
+            repair_alters=True,
+            repair_cautionaries=True
+        )
 
         # process LMX
         tokens = self.lex(text)
+        
+        self._repair_alters_visitor.run_manual(
+            element=self.part_element,
+            divisions="fractional"
+        )
         self.process_system(tokens)
+        self._repair_alters_visitor.done()
 
         # add the <staves> element if 2 or more staves present
         self._add_staves_head_element()
@@ -211,7 +219,8 @@ class Decoder:
                 last_notelike = None
         
         # infer pitch alterations
-        self._pitch_alternator.process_measure(measure_element)
+        assert self._repair_alters_visitor is not None
+        self._repair_alters_visitor.run_measure(measure_element)
 
         return measure_element
     
@@ -399,7 +408,7 @@ class Decoder:
         else:
             duration: str = self._get_fractional_duration(note_type, None)
         
-        duration_element = ET.Element("duration")
+        duration_element = ET.Element("duration", {"fractional": "yes"})
         duration_element.text = duration
         element.append(duration_element)
     
@@ -505,11 +514,11 @@ class Decoder:
         if is_grace:
             pass # no duration element in grace notes
         elif is_measure_rest and self._fractional_measure_duration is not None:
-            duration_element = ET.Element("duration")
+            duration_element = ET.Element("duration", {"fractional": "yes"})
             duration_element.text = str(self._fractional_measure_duration)
             note_element.append(duration_element)
         elif note_type is not None:
-            duration_element = ET.Element("duration")
+            duration_element = ET.Element("duration", {"fractional": "yes"})
             tm = (
                 time_modification_token.terminal
                 if time_modification_token is not None

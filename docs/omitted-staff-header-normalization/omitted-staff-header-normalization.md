@@ -39,12 +39,14 @@ This transposition is NOT a typical harmonic transposition, because music notati
 
 Because the transposition preserves visual appearance, existing accidentals in the score do not pose a problem. Notes that had an accidental originally will have that same accidental after the transposition (which will correspond to the same `<alter>` pitch value). In other words, only the pitch `<step>` and `<octave>` values change.
 
+One issue, though, is posed by key signatures. These introduce `<alter>` values for notes without any visible accidental and the pitches affected by key signature do not change with transposition, while pitches of notes do. This creates a mismatch of alters between notes affected by a key signature before and after the transposition. While the visual `<accidental>` values remain correct, the semantic `<alter>` values become out of sync with them. This is an issue in two respects: first, the MusicXML is invalid, since the visual and semantic data should match; second, MuseScore uses `<alter>` values to determine accidental placement and ignores `<accidental>` values (except for cautionary accidentals). For both reasons, after we transpose pitches, we have to manually go over the score and set `<alter>` values to match the visual accidentals and key signatures present. This is done by invoking the `PitchAlternator` on the output of our transposition.
+
 To perform the normalization visualized above, use the following code:
 
 ```py
 from lmx.musicxml.omitted_staff_header.normalize_invisible_header_clef \
-    import normalize_invisible_header_clef, Clef
-from lmx.musicxml.omitted_staff_header.Clef \
+    import normalize_invisible_header_clef
+from lmx.musicxml.pitch.Clef \
     import G_CLEF, F_CLEF
 
 normalized_part = normalize_invisible_header_clef(

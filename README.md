@@ -98,10 +98,12 @@ TODO: how to use from python?
         - [MusicXML element reference](docs/design-process-notes/design-process-notes.md#musicxml-element-reference-with-implementation-notes)
 - MusicXML utilities
     - Reading and writing MusicXML files (TODO: `lmx.musicxml.io` module)
-    - [Omitted staff header normalization](docs/omitted-staff-header-normalization/omitted-staff-header-normalization.md)
     - Handling duration and onsets
         - [`Onset` and `Duration` representations](docs/onset-and-duration-representations.md)
         - [`OnsetVisitor` utility](docs/onset-visitor-utility.md)
+    - Handling pitch
+        - [`repair_alters` utility](docs/repair-alters-utility.md)
+    - [Omitted staff header normalization](docs/omitted-staff-header-normalization/omitted-staff-header-normalization.md)
 - MuseScore utilities
     - ...
 

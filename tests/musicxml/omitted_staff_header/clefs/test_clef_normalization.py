@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from lmx.musicxml.omitted_staff_header.normalize_invisible_header_clef \
     import normalize_invisible_header_clef
-from lmx.musicxml.omitted_staff_header.Clef \
+from lmx.musicxml.pitch.Clef \
     import Clef, G_CLEF, F_CLEF, C_CLEF
 from typing import Literal
 import pytest
@@ -76,6 +76,20 @@ def test_transposition_until_clef_change():
         G_CLEF,
         "g-clef-with-change"
     )
+
+
+def test_transposition_with_key_signature():
+    normalize(
+        "g-clef-octave-key-2",
+        F_CLEF,
+        "f-clef-octave-key-2"
+    )
+    normalize(
+        "f-clef-octave-key-2",
+        G_CLEF,
+        "g-clef-octave-key-2"
+    )
+
 
 def test_piano_normalization():
     normalize(

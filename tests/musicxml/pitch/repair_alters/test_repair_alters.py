@@ -22,10 +22,9 @@ def strip_and_repair(sample_name: str):
         alter_element = pitch_element.find("alter")
         if alter_element is not None:
             pitch_element.remove(alter_element)
-    # TODO: implement cautionaries
-    # for accidental_element in stripped_part.findall(".//accidental"):
-    #     accidental_element.attrib.pop("cautionary", None)
-    #     accidental_element.attrib.pop("parentheses", None)
+    for accidental_element in stripped_part.findall(".//accidental"):
+        accidental_element.attrib.pop("cautionary", None)
+        accidental_element.attrib.pop("parentheses", None)
 
     # run the repair
     repair_alters(stripped_part)

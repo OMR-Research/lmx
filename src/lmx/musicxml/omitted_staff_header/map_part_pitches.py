@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from .Pitch import Pitch
+from ..pitch.Pitch import Pitch
 from typing import Callable
 from ..time.PartOnset import PartOnset
 from ..time.OnsetVisitor import OnsetVisitor

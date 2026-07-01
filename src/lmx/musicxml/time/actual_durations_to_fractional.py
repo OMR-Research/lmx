@@ -38,6 +38,7 @@ def actual_durations_to_fractional(part_element: ET.Element):
         duration_value = Fraction(duration_element.text)
         duration_value = duration_value / current_divisions
         duration_element.text = str(duration_value)
+        duration_element.attrib["fractional"] = "yes"
     
     def _visit_notelike(notelike_element: ET.Element):
         duration_element = notelike_element.find("duration")

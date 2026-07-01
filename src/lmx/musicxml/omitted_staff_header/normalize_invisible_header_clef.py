@@ -1,14 +1,15 @@
 import xml.etree.ElementTree as ET
 import copy
 from typing import Literal
-from .Clef import Clef
-from .Pitch import Pitch
+from ..pitch.Clef import Clef
+from ..pitch.Pitch import Pitch
 from .map_part_pitches import map_part_pitches
 from ..attributes.get_head_attributes import get_head_attributes
 from .transpose_pitch_given_clef_change \
     import transpose_pitch_given_clef_change
 from ..time.PartOnset import PartOnset
 from ..time.OnsetVisitor import OnsetVisitor
+from ..pitch.repair_alters import repair_alters
 
 
 def normalize_invisible_header_clef(
@@ -220,5 +221,11 @@ def normalize_invisible_header_clef(
         )
 
     map_part_pitches(part_element, pitch_mapper)
+
+    ##################################################
+    # Phase 4 - correct alters due to key signatures #
+    ##################################################
+
+    repair_alters(part_element)
 
     return part_element

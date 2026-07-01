@@ -64,3 +64,4 @@ def fractional_durations_to_actual(part_element: ET.Element):
         duration_value = Fraction(duration_element.text) * divisions
         assert duration_value.denominator == 1
         duration_element.text = str(duration_value.numerator)
+        duration_element.attrib.pop("fractional", None)
