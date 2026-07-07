@@ -9,8 +9,8 @@
     <measure number="1">
       <attributes>
         <divisions>1</divisions>
-        <key print-object="no">
-          <fifths>3</fifths>
+        <key>
+          <fifths>0</fifths>
           </key>
         <clef>
           <sign>G</sign>
@@ -20,7 +20,6 @@
       <note>
         <pitch>
           <step>C</step>
-          <alter>1</alter>
           <octave>4</octave>
           </pitch>
         <duration>1</duration>
@@ -51,7 +50,6 @@
       <note>
         <pitch>
           <step>F</step>
-          <alter>1</alter>
           <octave>4</octave>
           </pitch>
         <duration>1</duration>
@@ -61,10 +59,15 @@
         </note>
       </measure>
     <measure number="2">
+      <attributes>
+        <key>
+          <fifths>-7</fifths>
+          </key>
+        </attributes>
       <note>
         <pitch>
           <step>G</step>
-          <alter>1</alter>
+          <alter>-1</alter>
           <octave>4</octave>
           </pitch>
         <duration>1</duration>
@@ -75,6 +78,7 @@
       <note>
         <pitch>
           <step>A</step>
+          <alter>-1</alter>
           <octave>4</octave>
           </pitch>
         <duration>1</duration>
@@ -85,6 +89,7 @@
       <note>
         <pitch>
           <step>B</step>
+          <alter>-1</alter>
           <octave>4</octave>
           </pitch>
         <duration>1</duration>
@@ -95,7 +100,7 @@
       <note>
         <pitch>
           <step>C</step>
-          <alter>1</alter>
+          <alter>-1</alter>
           <octave>5</octave>
           </pitch>
         <duration>1</duration>

@@ -74,7 +74,7 @@ class OnsetVisitor:
         return self._part_onset
     
     @property
-    def measure_index(self) -> MeasureOnset:
+    def measure_index(self) -> int:
         """Zero-based index of the currently visited `<measure>` element"""
         return self.part_onset.measure_index
     
@@ -297,7 +297,9 @@ class OnsetVisitor:
     ):
         assert measure_element.tag == "measure"
         
-        for i, child_element in enumerate(measure_element):
+        # materialize with list() so that the measure may be modified
+        # as it's being iterated thorugh
+        for i, child_element in list(enumerate(measure_element)):
             # record item on the tape
             if self._record_onsets:
                 self._onset_tape[id(child_element)] = self.part_onset

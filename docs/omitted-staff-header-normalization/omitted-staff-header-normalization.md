@@ -39,7 +39,7 @@ This transposition is NOT a typical harmonic transposition, because music notati
 
 Because the transposition preserves visual appearance, existing accidentals in the score do not pose a problem. Notes that had an accidental originally will have that same accidental after the transposition (which will correspond to the same `<alter>` pitch value). In other words, only the pitch `<step>` and `<octave>` values change.
 
-One issue, though, is posed by key signatures. These introduce `<alter>` values for notes without any visible accidental and the pitches affected by key signature do not change with transposition, while pitches of notes do. This creates a mismatch of alters between notes affected by a key signature before and after the transposition. While the visual `<accidental>` values remain correct, the semantic `<alter>` values become out of sync with them. This is an issue in two respects: first, the MusicXML is invalid, since the visual and semantic data should match; second, MuseScore uses `<alter>` values to determine accidental placement and ignores `<accidental>` values (except for cautionary accidentals). For both reasons, after we transpose pitches, we have to manually go over the score and set `<alter>` values to match the visual accidentals and key signatures present. This is done by invoking the `PitchAlternator` on the output of our transposition.
+One issue, though, is posed by key signatures. These introduce `<alter>` values for notes without any visible accidental and the pitches affected by key signature do not change with transposition, while pitches of notes do. This creates a mismatch of alters between notes affected by a key signature before and after the transposition. While the visual `<accidental>` values remain correct, the semantic `<alter>` values become out of sync with them. This is an issue in two respects: first, the MusicXML is invalid, since the visual and semantic data should match; second, MuseScore uses `<alter>` values to determine accidental placement and ignores `<accidental>` values (except for cautionary accidentals). For both reasons, after we transpose pitches, we have to manually go over the score and set `<alter>` values to match the visual accidentals and key signatures present. This is done by invoking the `repair_alters` function on the output of our transposition.
 
 To perform the normalization visualized above, use the following code:
 
@@ -58,9 +58,9 @@ normalized_part = normalize_invisible_header_clef(
 
 The function returns a modified copy of the input `<part>` element.
 
-The `desired_clef` argument may be one `Clef` or a list of `Clefs` if the part has multiple staves (e.g. piano).
+The `desired_clef` argument may be one `Clef` or a list of `Clef`s if the part has multiple staves (e.g. piano).
 
-The `when_clef_visible` option controls the function's behaviour when the header clef(s) is not invisible. This is unexpected behaviour, since we call this function precisely to handle invisible header clefs. You can choose from these options:
+The `when_clef_visible` option controls the function's behaviour when the header clef(s) are not invisible. This is unexpected behaviour, since we call this function precisely to handle invisible header clefs. You can choose from these options:
 
 - `raise-exception`: The careful variant where the function raises a `ValueError`.
 - `dont-normalize`: The staff is completely ignored, leaving everything as it is.
@@ -72,14 +72,36 @@ This option applies to each staff independently (except for the exception of cou
 The option you choose depends on what you know about the data you process:
 
 - If you don't know why header clefs should be visible, use `raise-exception`.
-- If you know the clef is not visible (some external human annotation) and the MusicXML may be in unknown state, use `normalize-set-invisible`.
+- If you know the clef is not visible (some external human annotation) and the MusicXML may be in an unknown visibility state, use `normalize-set-invisible`.
 - If you transform data, where the MusicXML definitely has invisible clefs in places where there really are omitted clefs in the image, but some of the data has perfectly normal visible clefs that you want to skip, use `dont-normalize`.
 - The `normalize-keep-visible` option is present only for completeness, I'm unsure about when it might be needed.
 
 
 ## Key signatures
 
-TODO: how key signatures behave and how are normalized
+Similar to clefs, MusicXML may contain invisible header key signatures. Since they are not visible in the image, an OMR model would think there is the null key signature (the `fifths:0` signature). Normalization here means converting any non-null invisible key signature to the null key signature and adjusting `<alter>` values of the following notes accordingly. This operation also affects accidental `cautionary="yes"` values, which also need to be updated. However with the `repair_alters` method available, we only need to change the key signature and then run the repair method.
+
+> **Note:** Null key signature is special in that, it is ALWAYS invisible when in the header position (inside the part it may be rendered with natural accidentals). This means it is handled in a special way in the normalization function, for example, the header null key signature is never `print-object="no"` since it makes no sense.
+
+To perform normalization to the null signature, use the following code:
+
+```py
+from lmx.musicxml.omitted_staff_header.normalize_invisible_key_signature \
+    import normalize_invisible_key_signature
+
+normalized_part = normalize_invisible_key_signature(
+    part_element=my_part, # MusicXML <part> element as ET.Element
+    desired_key=0, # null key signature (the fifths value)
+    when_key_visible="raise-exception", # be careful
+)
+```
+
+The function returns a modified copy of the input `<part>` element.
+
+The `when_key_visible` option controls the function's behaviour when the header key is not invisible. This is unexpected behaviour, since we call this function precisely to handle invisible header keys. You can choose from these options:
+
+- `raise-exception`: The careful variant where the function raises a `ValueError`.
+- `dont-normalize`: The key signature is not replaced, only the `repair_alters` function is run, which should do no modifications if the input MusicXML is self-consistent.
 
 
 ## Time signatures
@@ -106,7 +128,13 @@ set_header_clef_visibility(
 Setting header key signature visibility:
 
 ```py
-TODO
+from lmx.musicxml.omitted_staff_header.set_header_key_visibility \
+    import set_header_key_visibility
+
+set_header_key_visibility(
+    part_element=my_part, # modifies the <part> in-place
+    set_visibility="visible", # or "invisible"
+)
 ```
 
 Setting header time signature visibility:
@@ -116,3 +144,8 @@ TODO
 ```
 
 These functions only work by adding or removing the `print-object="no"` XML attribute.
+
+
+## Undoing normalization
+
+When normalization is used to train an OMR model, it will learn to output the same G-clef, null key signature combo each time it does not see a clef and/or a key signature. However, when using such a model on a page of music where the first system does have a header, when concatenating results for individual systems, following system headers must be normalized back to the key signature of the first system (or a respective clef/key change). The normalization functions used above may be used for that as well, simply provide the proper desired clef/key and then set the header clef/key to visible/invisible or alternatively completely remove the header if not needed.

@@ -14,7 +14,7 @@ def set_header_clef_visibility(
     The given part element is modified in-place.
 
     :param part_element: The part element for which to adjust header clefs.
-    :param set_visibility: Whether to se clefs as visible or invisible.
+    :param set_visibility: Whether to set clefs as visible or invisible.
     """
     measure_element = part_element.find("measure")
 
