@@ -106,7 +106,43 @@ The `when_key_visible` option controls the function's behaviour when the header 
 
 ## Time signatures
 
-TODO: how time signatures behave and how are normalized (they aren't)
+Time signature normalization is the simplest, since it does not affect the musical content of a `<part>` at all. MusicXML does not have the concept of a measure "size", so time signature is only a recommendation and measure duration is simply the duration of its content. While in MuseScore, replacing a time signature may redefine measure bounaries (going from `4/4` to `3/4`), this normalization function does not do that, since measure boundaries are visible in the input image, so the OMR model should produce them correctly irrespective of the chosen time signature. To the OMR model, time signature really is "just" the two numbers at the beginning of the staff, without any further meaning.
+
+For these reasons, time signature may be missing in the MusicXML and MuseScore will happily load it and work with it (it will assume 4 beats per measure to determine overfull/underfull measures, but will render measures properly).
+
+Thefore, for our normalization, we will normalize **to** missing time signature. I.e. we will just erase invisible header `<time>` elements. The following code may be used for that purpose:
+
+```py
+from lmx.musicxml.omitted_staff_header.normalize_invisible_time_signature \
+    import normalize_invisible_time_signature
+
+normalized_part = normalize_invisible_time_signature(
+    part_element=my_part, # MusicXML <part> element as ET.Element
+    desired_time=None, # remove the time signature all together
+    when_time_visible="raise-exception", # be careful
+)
+```
+
+You can also provide a precise `<time>` element to be used for the header. It will be copied and its visibility will be set to invisible:
+
+```py
+TIME_34 = ET.fromstring(
+    "<time><beats>3</beats><beat-type>4</beat-type></time>"
+)
+
+normalized_part = normalize_invisible_time_signature(
+    part_element=my_part,
+    desired_time=TIME_34, # normalize to 3/4 time signature
+    when_time_visible="raise-exception",
+)
+```
+
+The function returns a modified copy of the input `<part>` element.
+
+The `when_time_visible` option controls the function's behaviour when the header time is not invisible. This is unexpected behaviour, since we call this function precisely to handle invisible header times. You can choose from these options:
+
+- `raise-exception`: The careful variant where the function raises a `ValueError`.
+- `dont-normalize`: The time signature is not replaced, the whole part is skipped.
 
 
 ## Forcing invisible staff header
@@ -140,7 +176,13 @@ set_header_key_visibility(
 Setting header time signature visibility:
 
 ```py
-TODO
+from lmx.musicxml.omitted_staff_header.set_header_time_visibility \
+    import set_header_time_visibility
+
+set_header_time_visibility(
+    part_element=my_part, # modifies the <part> in-place
+    set_visibility="visible", # or "invisible"
+)
 ```
 
 These functions only work by adding or removing the `print-object="no"` XML attribute.
