@@ -53,10 +53,13 @@ class TestClefs(TokenizationTestCase):
     # Invisible head clefs #
     ########################
 
-    # TODO: invisible clefs
-    # - invisible G clef
-    # - invisible piano clefs
-    # - ...
+    def test_invisible_clefs_encoding(self):
+        self.encode_part("g-clef-mono-invisible")
+        self.encode_part("piano-clefs-invisible")
+    
+    def test_invisible_clefs_decoding(self):
+        self.decode_part("g-clef-mono-invisible")
+        self.decode_part("piano-clefs-invisible")
 
     ####################
     # Full score clefs #

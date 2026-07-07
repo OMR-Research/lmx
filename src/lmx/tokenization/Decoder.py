@@ -349,6 +349,7 @@ class Decoder:
     def process_clef(self, tree: Tree) -> ET.Element:
         assert tree.root.terminal in CLEF_TOKENS
 
+        print_token = self._extract_prefix(tree, ["print-object:no"])
         staff_token = self._extract_suffix(tree, STAFF_TOKENS)
         self._list_unexpected_valencies(tree)
         
@@ -361,6 +362,9 @@ class Decoder:
         line_element.text = line
         clef_element.append(sign_element)
         clef_element.append(line_element)
+
+        if print_token is not None:
+            clef_element.attrib["print-object"] = "no"
 
         if staff_token is not None:
             staff_number = staff_token.terminal.split(":")[-1]

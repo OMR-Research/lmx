@@ -696,7 +696,7 @@ This is an attempt at modelling the linearized MusicXML by a simple grammar:
     | "beat-type:16"
 
 # clef is the clef type token, combined with the staff number for grandstaves
-[clef] = [clef-type] [staff]?
+[clef] = [print-no]? [clef-type] [staff]?
 
 [clef-type] =
     | "clef:G1" | "clef:G2" | "clef:G3" | "clef:G4" | "clef:G5"
@@ -704,7 +704,7 @@ This is an attempt at modelling the linearized MusicXML by a simple grammar:
     | "clef:F1" | "clef:F2" | "clef:F3" | "clef:F4" | "clef:F5"
 
 [note] = (
-    [print]?
+    [print-no]?
     [grace]?
     [chord]?
     ([rest] | [pitch] | [forward] | [backup])
@@ -733,7 +733,7 @@ This is an attempt at modelling the linearized MusicXML by a simple grammar:
 # some objects are not printed
 # (invisible cross-voice slur noteheads)
 # (invisible rests in the first voice)
-[print] = "print-object:no"
+[print-no] = "print-object:no"
 
 # [grace] indicates that the note is a grace note, can be slashed
 [grace] = "grace" "grace:slash"?

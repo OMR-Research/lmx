@@ -489,20 +489,25 @@ class Encoder:
     def process_clefs(self, clefs: List[ET.Element]):
         # get all the currently defined clefs (staff -> clef token)
         # (those are always printed)
-        clefs_to_print = {}
+        clefs_to_print: dict[int, str] = {}
+        clefs_print_no: dict[int, bool] = {}
         for clef in clefs:
             staff_number = int(clef.attrib.get("number", "1"))
+            print_no = clef.attrib.get("print-object", "yes") == "no"
             clef_token = (
                 "clef:" + clef.find("sign").text.upper()
                     + clef.find("line").text
             )
             clefs_to_print[staff_number] = clef_token
+            clefs_print_no[staff_number] = print_no
 
             # remember the clef for future printing
             self._clefs[staff_number] = clef_token
 
         # now we can print all the clefs to be printed, IN THE PROPER ORDER
         for staff_number in sorted(clefs_to_print.keys()):
+            if clefs_print_no[staff_number]:
+                self._emit("print-object:no")
             self._emit(clefs_to_print[staff_number])
             if self._staves is not None: # emit staff number only if we're multistaff
                 self._emit("staff:" + str(staff_number))
