@@ -336,7 +336,8 @@ class Encoder:
             return
 
         # verify for measure rests
-        if is_measure_rest:
+        # (self._measure_duration is None if there was no time signature yet)
+        if is_measure_rest and self._measure_duration is not None:
             if duration != self._measure_duration:
                 self._error(
                     "Measure rest does not have expected duration.",
