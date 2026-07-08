@@ -83,6 +83,8 @@ Similar to clefs, MusicXML may contain invisible header key signatures. Since th
 
 > **Note:** Null key signature is special in that, it is ALWAYS invisible when in the header position (inside the part it may be rendered with natural accidentals). This means it is handled in a special way in the normalization function, for example, the header null key signature is never `print-object="no"` since it makes no sense.
 
+> **Note:** Key normalization also performs removal of invisible non-header key signatures that do not change the current key (redundant key signatures). These sometimes appear in the data form some obscure reason and event MuseScore removes them when loading the part.
+
 To perform normalization to the null signature, use the following code:
 
 ```py

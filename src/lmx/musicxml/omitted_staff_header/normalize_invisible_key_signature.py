@@ -45,10 +45,12 @@ def normalize_invisible_key_signature(
     # create a copy of the input before we start modifying it
     part_element = copy.deepcopy(part_element)
 
+    _remove_redundant_key_signatures(part_element)
+
     class MyVisitor(OnsetVisitor):
         def __init__(self):
             super().__init__(record_onsets=False)
-        
+
         def visit_attributes(self, attributes_element: ET.Element):
             # visit all <key> elements (should be only one)
             for key_element in attributes_element.findall("key"):
@@ -63,7 +65,7 @@ def normalize_invisible_key_signature(
                 is_header_key = self.part_onset == 0
                 is_invisible = key_element.attrib.get("print-object", "yes") == "no"
                 is_null_signature = key_element.findtext("fifths") == "0"
-                
+
                 # a) handle header keys
                 if is_header_key:
                     # handle visible header keys
@@ -108,3 +110,46 @@ def _update_header_key(
         key_element.attrib.pop("print-object", None)
     else:
         key_element.attrib["print-object"] = "no"
+
+
+def _remove_redundant_key_signatures(
+        part_element: ET.Element,
+):
+    """Removes invisible key signatures inside parts that do not change the key."""
+    
+    class MyVisitor(OnsetVisitor):
+        def __init__(self) -> None:
+            super().__init__(record_onsets=False)
+
+            self.current_key: int = 0
+            """Key signature that is currently active as
+            we're visiting the score (regardless of whether it was visible)"""
+        
+        def visit_attributes(self, attributes_element: ET.Element):
+            # visit all <key> elements (should be only one)
+            for key_element in attributes_element.findall("key"):
+                # the <key> element should NOT have a staff number
+                if "number" in key_element.attrib:
+                    raise ValueError(
+                        "This function supports only full-part key signatures, " +
+                        "not per-staff key signatures."
+                    )
+                
+                # extract key signature parameters
+                is_header_key = self.part_onset == 0
+                is_invisible = key_element.attrib.get("print-object", "yes") == "no"
+                fifths_value = int(key_element.findtext("fifths") or "0")
+                is_redundant = is_invisible and fifths_value == self.current_key
+
+                if is_redundant and not is_header_key:
+                    # remove redundant
+                    attributes_element.remove(key_element)
+                else:
+                    # update the tracked state
+                    self.current_key = fifths_value
+            
+            # remove the <attributes> element if empty
+            if len(attributes_element) == 0:
+                self.current_measure_element.remove(attributes_element)
+
+    MyVisitor().run(part_element)

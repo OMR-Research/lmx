@@ -97,3 +97,16 @@ def test_normalization_raises_on_invisible_key_change():
             0,
             when_key_visible="raise-exception",
         )
+
+
+def test_invisible_redundant_key_signature_is_removed():
+    # A key signature that is in the middle of the part and is
+    # invisible AND is the same as the currently active key
+    # signature (i.e. introduces no key change) will be removed.
+    # This weird quirk is present in DoLoReS for some reason.
+    normalize(
+        "piano-7-octave-with-redundant",
+        0,
+        "piano-0-octave",
+        when_key_visible="dont-normalize"
+    )

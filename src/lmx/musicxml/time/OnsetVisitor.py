@@ -32,6 +32,10 @@ class OnsetVisitor:
         self._finished: bool = False
         """Has the visitor ran already and finished without throwing?"""
 
+        self._element: ET.Element | None = None
+        """The `<part>` or `<measure>` element this visitor was launched on.
+        Is None before the visitor is run."""
+
         self._divisions: int | Literal["fractional"] | None = None
         """Divisions given to run or resolved from the given element.
         Is None before the visitor is run."""
@@ -82,6 +86,19 @@ class OnsetVisitor:
     def measure_onset(self) -> MeasureOnset:
         """Current onset within the current `<measure>`"""
         return self.part_onset.measure_onset
+    
+    @property
+    def current_measure_element(self) -> ET.Element:
+        """Currently visited `<measure>` element, raises if no longer visiting"""
+        if self._element is None:
+            raise RuntimeError("The visitor has not yet started")
+        if self._finished:
+            raise RuntimeError("The visitor is no longer running")
+        
+        if self._element.tag == "measure":
+            return self._element
+        else:
+            return self._element[self.measure_index]
     
     def onset_of(self, element: ET.Element):
         """Returns the onset of a child element of a `<measure>`.
@@ -244,6 +261,9 @@ class OnsetVisitor:
 
         if self._finished:
             raise RuntimeError("An OnsetVisitor can only be run once")
+
+        # remember the element we run on
+        self._element = element
 
         # automatically resolve divisions value
         if divisions == "autoresolve":
