@@ -336,9 +336,10 @@ class Encoder:
             return
 
         # verify for measure rests
-        # (self._measure_duration is None if there was no time signature yet)
-        if is_measure_rest and self._measure_duration is not None:
-            if duration != self._measure_duration:
+        if is_measure_rest:
+            # (self._measure_duration is None if there was no time signature yet)
+            if self._measure_duration is not None \
+                    and duration != self._measure_duration:
                 self._error(
                     "Measure rest does not have expected duration.",
                     "Divisions:", + self._divisions,
@@ -348,14 +349,16 @@ class Encoder:
             return
         
         # verify for regular notes
-        expected_duration, expected_duration_float = self._expected_note_duration(note)
-        if expected_duration != duration:
-            self._error(
-                "Note does not have expected duration.",
-                "Expected:", expected_duration_float,
-                "Actual:", duration,
-                ET.tostring(note)
-            )
+        # (not for grace notes, they don't have duration)
+        if not is_grace_note:
+            expected_duration, expected_duration_float = self._expected_note_duration(note)
+            if expected_duration != duration:
+                self._error(
+                    "Note does not have expected duration.",
+                    "Expected:", expected_duration_float,
+                    "Actual:", duration,
+                    ET.tostring(note)
+                )
     
     def _expected_note_duration(self, note: ET.Element) -> int:
         type_element = note.find("type")
