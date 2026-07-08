@@ -190,9 +190,9 @@ def render_staff(
                     )
                 else:
                     overflown_sample_indices.append(sample)
-
-            # move the png file to desired destination
-            shutil.move(sample_png_files[0], output_png_files[sample])
+            else:
+                # move the png file to desired destination
+                shutil.move(sample_png_files[0], output_png_files[sample])
 
 
 def _prepare_part_as_musicxml_tree(
