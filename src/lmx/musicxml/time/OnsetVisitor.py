@@ -9,7 +9,7 @@ from typing import Literal
 
 
 MEASURE_ELEMENT_CHILDREN: list[str] = [
-    "note", "backup", "forward", "directions",
+    "note", "backup", "forward", "direction",
     "attributes", "harmony", "figured-bass",
     "print", "sound", "listening", "barline",
     "grouping", "link", "bookmark"
@@ -336,7 +336,8 @@ class OnsetVisitor:
             )
     
     def visit_measure_child(self, child_element: ET.Element):
-        assert child_element.tag in MEASURE_ELEMENT_CHILDREN
+        assert child_element.tag in MEASURE_ELEMENT_CHILDREN, \
+            f"Unknown measure child element <{child_element.tag}>"
 
         # call visitor methods (overridable)
         if child_element.tag == "note":
