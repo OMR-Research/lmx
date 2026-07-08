@@ -41,6 +41,7 @@ def normalize(
 # Ordinary behaviour #
 ######################
 
+
 def test_plain_note_transposition():
     normalize("g-clef-octave", F_CLEF, "f-clef-octave")
     normalize("g-clef-octave", C_CLEF, "c-clef-octave")
@@ -49,9 +50,11 @@ def test_plain_note_transposition():
     normalize("f-clef-octave", C_CLEF, "c-clef-octave")
     normalize("c-clef-octave", F_CLEF, "f-clef-octave")
 
+
 def test_accidental_note_transposition():
     normalize("g-clef-octave-sharped", F_CLEF, "f-clef-octave-sharped")
     normalize("f-clef-octave-sharped", G_CLEF, "g-clef-octave-sharped")
+
 
 def test_doubled_accidental_note_transposition():
     normalize(
@@ -103,6 +106,7 @@ def test_piano_normalization():
         "cc-piano-octave"
     )
 
+
 def test_piano_with_changes_normalization():
     normalize(
         "cc-piano-with-changes",
@@ -114,6 +118,7 @@ def test_piano_with_changes_normalization():
         [C_CLEF, C_CLEF],
         "cc-piano-with-changes"
     )
+
 
 def test_normalization_for_complex_onset():
     # onset calculation is complicated for chords
@@ -129,9 +134,11 @@ def test_normalization_for_complex_onset():
         "f-clef-complex-onset"
     )
 
+
 ##############################
 # Unexpected input behaviour #
 ##############################
+
 
 def test_normalizing_visible_clef_should_not_normalize():
     normalize(
@@ -147,6 +154,7 @@ def test_normalizing_visible_clef_should_not_normalize():
         when_clef_visible="dont-normalize"
     )
 
+
 def test_normalizing_visible_clef_should_keep_visible():
     normalize(
         "g-clef-octave-visible",
@@ -161,6 +169,7 @@ def test_normalizing_visible_clef_should_keep_visible():
         when_clef_visible="normalize-keep-visible"
     )
 
+
 def test_normalizing_visible_clef_should_set_invisible():
     normalize(
         "g-clef-octave-visible",
@@ -174,6 +183,7 @@ def test_normalizing_visible_clef_should_set_invisible():
         "gf-piano-octave",
         when_clef_visible="normalize-set-invisible"
     )
+
 
 def test_normalizing_visible_clef_should_raise():
     with pytest.raises(ValueError, match="this method expects header clefs to be invisible"):
@@ -190,6 +200,7 @@ def test_normalizing_visible_clef_should_raise():
             when_clef_visible="raise-exception",
         )
 
+
 def test_normalization_raises_on_invisible_clef_change():
     with pytest.raises(ValueError, match="Invisible clefs are only allowed at onset 0"):
         normalize_invisible_header_clef(
@@ -197,3 +208,11 @@ def test_normalization_raises_on_invisible_clef_change():
             desired_clef=F_CLEF,
             when_clef_visible="raise-exception",
         )
+
+
+def test_missing_clefs_get_reinserted_as_g_clefs():
+    normalize("missing-clef-octave", G_CLEF, "g-clef-octave")
+    normalize("missing-clef-octave", F_CLEF, "f-clef-octave")
+
+    normalize("missing-piano-octave", [G_CLEF, F_CLEF], "gf-piano-octave")
+    normalize("missing-piano-octave", [C_CLEF, C_CLEF], "cc-piano-octave")

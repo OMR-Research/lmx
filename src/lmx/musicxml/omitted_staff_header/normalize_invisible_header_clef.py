@@ -5,6 +5,7 @@ from ..pitch.Clef import Clef
 from ..pitch.Pitch import Pitch
 from .map_part_pitches import map_part_pitches
 from ..attributes.get_head_attributes import get_head_attributes
+from ..attributes.sort_attributes import sort_attributes
 from .transpose_pitch_given_clef_change \
     import transpose_pitch_given_clef_change
 from ..time.PartOnset import PartOnset
@@ -69,6 +70,8 @@ def normalize_invisible_header_clef(
             "Given <part> element does not have the header <attributes> " + \
             "element that defines header clefs."
         )
+    
+    _fill_in_missing_header_clefs(part_element)
 
     # Get the header clef for each (defined) staff
     # staff number -> clef element
@@ -229,3 +232,69 @@ def normalize_invisible_header_clef(
     repair_alters(part_element)
 
     return part_element
+
+
+def _fill_in_missing_header_clefs(
+        part_element: ET.Element,
+):
+    """In MuseScore, you can delete header clefs so hard,
+    that they don't even appear in the MusicXML. MuseScore then reads
+    such documents as if there were G clefs (even for both piano clefs),
+    however this breaks originally F-clef staves. This MusicXML data is
+    produced by MuseScore 3. MuseScore 4 outputs such clefs as invisible
+    as it should. The way how to delete clefs this hard is: Right-click a staff,
+    open 'Staff/Part properties...', untick 'Show clef'
+    
+    This function tries to recover by re-inserting G clefs
+    (and F clefs for the second staff), however,
+    if the original clef was not G/F, then this introduces a mistake.
+    But it's the best we can do.
+    """
+    header_attributes = get_head_attributes(
+        part_element.find("measure"), # first measure
+        create_if_missing=False
+    )
+    if header_attributes is None:
+        raise ValueError(
+            "Given <part> element does not have the header <attributes> " + \
+            "element that defines header clefs."
+        )
+    
+    staves_text: str | None = header_attributes.findtext("staves")
+    staff_count: int | None = int(staves_text) if staves_text is not None else None
+
+    # single staff
+    if staff_count is None:
+        clef_count = len(header_attributes.findall("clef"))
+        if clef_count > 0:
+            return # do nothing, this part is completely fine
+        
+        # insert an invisible G clef
+        header_attributes.append(ET.fromstring("""
+            <clef print-object="no">
+                <sign>G</sign>
+                <line>2</line>
+            </clef>
+        """))
+        sort_attributes(header_attributes)
+
+    # multi-staff
+    else:
+        for staff_number in range(1, staff_count + 1):
+            clef_count = len(header_attributes.findall(
+                f"clef[@number='{staff_number}']")
+            )
+            if clef_count > 0:
+                continue # do nothing, this staff is completely fine
+            
+            clef_sign = "F" if staff_number == 2 else "G"
+            clef_line = "4" if staff_number == 2 else "2"
+
+            # insert an invisible G clef
+            header_attributes.append(ET.fromstring(f"""
+                <clef number="{staff_number}" print-object="no">
+                    <sign>{clef_sign}</sign>
+                    <line>{clef_line}</line>
+                </clef>
+            """))
+            sort_attributes(header_attributes)
