@@ -10,6 +10,7 @@ import subprocess
 import json
 import os
 import copy
+from typing import Literal
 
 
 def render_staff(
@@ -21,6 +22,9 @@ def render_staff(
         page_width_tenths=6000,
         print_musescore_output=False,
         print_tmpfolder_before_exitting=False,
+        on_page_overflow: Literal["raise-exception", "return-index"]
+            = "raise-exception",
+        overflown_sample_indices: list[int] | None = None
 ):
     """Renders a single staff (or grandstaff) as a single wide PNG image.
 
@@ -56,6 +60,13 @@ def render_staff(
     :param print_tmpfolder_before_exitting: Used for debugging,
         prints the contents of the temporary folder, within which
         MuseScore is executed.
+    :param on_page_overflow: When during rendering the page overflows,
+        what should happen. Either raise an exception or return the
+        overflown sample index.
+    :param overflown_sample_indices: Provide a list into which this method
+        will insert overflown sample indices. Provide None if you don't
+        care about this value (the default). Even if only one sample is given,
+        its index (zero) will be inserted into the list.
     """
     # check arguments
     if type(part_element) is list:
@@ -80,6 +91,14 @@ def render_staff(
         output_png_files = [output_png_file]
     else:
         output_png_files = output_png_file
+    
+    if overflown_sample_indices is None:
+        overflown_sample_indices = []
+    
+    if len(overflown_sample_indices) != 0:
+        raise ValueError(
+            "The overflown_sample_indices list should be provided empty."
+        )
     
     # number of input-output sample pairs
     sample_count = len(part_elements)
@@ -161,12 +180,16 @@ def render_staff(
             sample_png_files = list((samples_folder / str(sample)).glob("*.png"))
             assert len(sample_png_files) > 0, "MuseScore didn't produce an image"
             if len(sample_png_files) > 1:
-                raise RuntimeError(
-                    "There was a page-width overflow which resulted in" +
-                    " multiple PNG files being generated. Either " +
-                    "shorten the input <part> element, or increase " +
-                    "the page_width_tenths argument value."
-                )
+                if on_page_overflow == "raise-exception":
+                    raise RuntimeError(
+                        "There was a page-width overflow which resulted in" +
+                        " multiple PNG files being generated. Either " +
+                        "shorten the input <part> element, or increase " +
+                        "the page_width_tenths argument value. " +
+                        f"The failed file is: {output_png_files[sample]}"
+                    )
+                else:
+                    overflown_sample_indices.append(sample)
 
             # move the png file to desired destination
             shutil.move(sample_png_files[0], output_png_files[sample])
@@ -174,8 +197,8 @@ def render_staff(
 
 def _prepare_part_as_musicxml_tree(
         part_element: ET.Element,
-        render_invisible_attributes=False,
-        page_width_tenths=4000,
+        render_invisible_attributes: bool,
+        page_width_tenths: int,
 ):
     # make a copy of the part, since we're gonna be modifying it
     part_element = copy.deepcopy(part_element)
