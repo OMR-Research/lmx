@@ -405,11 +405,11 @@ Here are some interesting scores, time signature-wise, for testing:
 
 ### Tuplets and tremolos `<tuplet>`, `<tremolo>`, `[tuplet]`, `[tremolo]`
 
-Tuplets and tremolos are the notation elements, that utilize MusicXML's `<time-modification>` element. This element lets us define notes, that are non-2 division of time.
+Tuplets and tremolos are the notation elements that use MusicXML's `<time-modification>` element. This element lets us define notes that are non-binary divisions of time.
 
-Normally, we have quarter notes and eighth notes. A quarter note triplet has duration in between - it takes 2/3 of a quarter note in duration. Similarly we can define fifths, sevenths, etc. A standalone tuplet note is identified by its type and the time-shrinking ratio from `<time-modification>`. For reason we decided to extend the note `[type]` with a `[time-modification]` token, which is computed directly from the `<time-modification>` MusicXML element.
+Normally, we have quarter notes and eighth notes. A quarter note triplet has duration in between — it takes 2/3 of a quarter note in duration. Similarly, we can define fifths, sevenths, etc. A standalone tuplet note is identified by its type and the time-shrinking ratio from `<time-modification>`. For this reason, we decided to extend the note `[type]` with a `[time-modification]` token, which is computed directly from the `<time-modification>` MusicXML element.
 
-So a quarter note triplet would be encoded like this:
+So, a quarter note triplet would be encoded like this:
 
 ```
 C4 quarter 3in2
@@ -419,7 +419,7 @@ There are two regular quarters in two quarters (in a half note), so a regular qu
 
 Sometimes, triplets are actually written in groups of 6, which makes them sixtuplets (with the same duration). In such a case, their time modification is `6in4` (which is technically identical to `3in2`, but semantically not).
 
-Apart from the duration information, tuplets are usually grouped by brackets or beams to form tuplet groups, so that they are easier to read. This information in MusicXML is stored in `<notations>/<tuplet>` element. We encode this information separately in two tokens:
+Apart from the duration information, tuplets are usually grouped by brackets or beams to form tuplet groups, so that they are easier to read. This information in MusicXML is stored in the `<notations>/<tuplet>` element. We encode this information separately in two tokens:
 
 ```
 tuplet:start tuplet:stop
@@ -427,7 +427,7 @@ tuplet:start tuplet:stop
 
 There are no nested tuplets in the corpus, so we ignore these.
 
-Double-note tremolos come with `<time-modification>` as well, because these are two notes, that together have the duration of one of only one of these notes. (e.g. two tremolo-beamed half notes in the duration of a single half note). For this reason, MusicXML adds a `2in1` time modification to these double tremolos. LMX keeps this information as well.
+Double-note tremolos come with `<time-modification>` as well, because these are two notes that together have the duration of only one of these notes (e.g. two tremolo-beamed half notes in the duration of a single half note). For this reason, MusicXML adds a `2in1` time modification to these double tremolos. LMX keeps this information as well.
 
 Tremolos are marked like other ornaments with tokens:
 
