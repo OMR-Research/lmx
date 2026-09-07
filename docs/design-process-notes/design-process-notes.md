@@ -568,7 +568,7 @@ Since a backup element is used whenever we define polyphony, it's an event that 
 
 #### Invisible notes `print-object="no"`
 
-Sometimes, the input MusicXML contains invisible notes. Usually, these occur in ceratin hacks, where there was not a straightforward way how to encode a given piece of music. While it might seem unintuitive, we do encode this information in our linearized MusicXML sequence, because an ML model reading the notation has actually a way, how to figure out the presence of invisible symbols.
+Sometimes, the input MusicXML contains invisible notes. Usually, these occur in certain hacks where there was no straightforward way to encode a given passage of music. While it might seem unintuitive, we do encode this information in our linearized MusicXML sequence, because an ML model reading the notation has actually a way to figure out the presence of invisible symbols.
 
 Here are a few examples:
 
