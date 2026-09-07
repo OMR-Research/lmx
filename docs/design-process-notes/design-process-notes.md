@@ -37,7 +37,7 @@ This is important, as there are multiple way how to encode the same music (multi
 - naming of voices (for example, MuseScore names second-staff voices 5-8, instead of 1-4)
 - naming of other values, where MusicXML lets you input `string`, without further specification
 
-It is not obvious, how to choose the canonical representation among all possible representations of the same music piece. Therefore we decided to use MuseScore 3.6.2 as the source of canonical MusicXML for this project. If you ever need to harmonize MusicXML from multiple sources, consider these variations.
+It is not obvious how to choose a canonical representation among all possible representations of the same music piece. Therefore, we decided to use MuseScore 3.6.2 as the source of canonical MusicXML for this project. If you ever need to harmonize MusicXML from multiple sources, consider these variations.
 
 
 ## Reference documentation
