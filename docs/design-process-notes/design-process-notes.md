@@ -27,7 +27,7 @@ In this documentation, MusicXML elements are represented by angle brackets (e.g.
 
 At the end of this document, there is a grammar pseudocode that specifies what tokens can be combined in what order.
 
-While MusicXML may allow more freedom in how music is represented (say, voices, backup/forward, staves), we based our decisions on the data taken from the [OpenScore Lieder Corpus](https://github.com/OpenScore/Lieder) (OSLiC), when exported to MusicXML through MuseScore 3.6.2. This provides us with additional structure (such as voice order), which is not important in our case, but you should take into consideration if using other sources of MusicXML.
+While MusicXML may allow more freedom in how music is represented (say, voices, backup/forward, staves), we based our decisions on the data taken from the [OpenScore Lieder Corpus](https://github.com/OpenScore/Lieder), when exported to MusicXML through MuseScore 3.6.2. This provides us with additional structure (such as voice order), which is not important in our case, but you should take into consideration if using other sources of MusicXML.
 
 This is important, as there are multiple way how to encode the same music (multiple MusicXML documents that render to the same printed score). The variability is in:
 
@@ -144,7 +144,7 @@ MusicXML allows four values:
 down up double none
 ```
 
-In practise, notes without any stem lack the `<stem>` element completely. Similarly, notes with two stems are represented as two separate `<note>` elements in two different voices, each having its own stem. This means that in the OpenScore Lieder corpus (OSLiC), when exported by MuseScore, only `down` and `up` and missing `<stem>` element are possible values.
+In practise, notes without any stem lack the `<stem>` element completely. Similarly, notes with two stems are represented as two separate `<note>` elements in two different voices, each having its own stem. This means that in the OpenScore Lieder Corpus, when exported by MuseScore, only `down` and `up` and missing `<stem>` element are possible values.
 
 But there are cases, where slurs from multiple voices converge on a chord. Since slurs cannot cross voices, the solution is to have two chords, one for each voice, placed on top of each other, and one of the voices is missing its stems. This is where the `none` value is used. You can see in the picture, the last eighth note chord has green stem and flag, which means the second voice is normal. But the blue voice (first voice) only has the two noteheads, but no stem:
 
@@ -240,7 +240,7 @@ C5 eighth dot beam:end
 
 The `<accidental>` element in MusicXML is present when there's a graphical accidental visible in the score next to the note. This is the way our linearized MusicXML encodes semitones, not the `<alter>` pitch element, that is ignored.
 
-The OpenScore Lieder corpus (OSLiC) uses these accidentals:
+The OpenScore Lieder Corpus uses these accidentals:
 
 ```
 sharp flat natural
@@ -287,7 +287,7 @@ Clef is represented in MusicXML by the `<clef>` element inside of the `<attribut
 - `<line>` - what staffline it sits on (1, 2, 3, 4, 5 - numbered from the bottom line up)
 - `number` - attribute containing the staff number (1 or 2 or missing)
 
-This is the distribution of clefs in the OpenScore Lieder corpus:
+This is the distribution of clefs in the OpenScore Lieder Corpus:
 
 ```py
 Counter({'G2': 4018, 'F4': 2825, 'G1': 4, 'C1': 2, 'F3': 1})
@@ -443,7 +443,7 @@ tremolo:3
 tremolo:4
 ```
 
-Tremolo element statisticis in OSLiC:
+Tremolo element statisticis in OpenScore Lieder Corpus:
 
 ```xml
 <tremolo type="start">3</tremolo>  1104
