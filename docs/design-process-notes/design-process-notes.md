@@ -864,7 +864,7 @@ This is an attempt at modelling the linearized MusicXML by a simple grammar:
 
 ## MusicXML element reference with implementation notes
 
-At [this page](https://www.w3.org/2021/06/musicxml40/musicxml-reference/element-tree/) you can see the list of all MusicXML elements in a tree-structure. Here we list these elements (or element groups) and state, whether they belong to the encoding, or are ignored for some reason:
+On [this page](https://www.w3.org/2021/06/musicxml40/musicxml-reference/element-tree/), you can see the list of all MusicXML elements in a tree structure. Below, we list these elements (or element groups) and state whether they are retained in the linearized encoding or are ignored for some reason.
 
 
 ### Used elements
