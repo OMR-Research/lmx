@@ -27,7 +27,7 @@ In this documentation, MusicXML elements are represented by angle brackets (e.g.
 
 At the end of this document, there is a grammar pseudocode that specifies what tokens can be combined in what order.
 
-While MusicXML may allow more freedom in how music is represented (say, voices, backup/forward, staves), we based our decisions on the data taken from the OpenScore Lieder corpus (OSLiC), when exported to MusicXML through MuseScore 3.6.2. This provides us with additional structure (such as voice order), which is not important in our case, but you should take into consideration if using other sources of MusicXML.
+While MusicXML may allow more freedom in how music is represented (say, voices, backup/forward, staves), we based our decisions on the data taken from the [OpenScore Lieder Corpus](https://github.com/OpenScore/Lieder) (OSLiC), when exported to MusicXML through MuseScore 3.6.2. This provides us with additional structure (such as voice order), which is not important in our case, but you should take into consideration if using other sources of MusicXML.
 
 This is important, as there are multiple way how to encode the same music (multiple MusicXML documents that render to the same printed score). The variability is in:
 
