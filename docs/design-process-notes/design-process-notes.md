@@ -307,7 +307,7 @@ In MusicXML, clefs at the beginning of systems are NOT explicitly encoded. Howev
 Key signature is represented in MusicXML by the `<key>` element inside of the `<attributes>` element. It can contain:
 
 - `<fifths>` - encodes the number of sharps or flats
-- `<cancel>` - explicit cancelling of the previous key signature, since not used in OpenScore Lieder corpus, we ignore this element
+- `<cancel>` - explicit cancelling of the previous key signature, since not used in OpenScore Lieder Corpus, we ignore this element
 - `<mode>` - specifies the mode of the key (major, minor, dorian, ... unusual ones), here only "major", "minor", and "none" are used in the corpus; but this element is ignored because it encodes a semantic "meaning" or "understanding" of the key with respect to the song - it has no effect on the number, or positioning of the key signature accidentals
 
 The `<fifths>` element value is a number - the number of flats/sharps, in range:
@@ -338,7 +338,7 @@ In MusicXML, key signatures at the beginning of systems are NOT explicitly encod
 > **On reading time in music:**<br>
 > Time signature consist of two numbers on top of each other (`C` means `4/4` and `crossed C` means `2/2`). The top number states the number of *beats* per mesure, the bottom one states the type of the *beat*. `/2` means one beat is one half note, `/4` means one beat is one quarter note. The tempo (e.g. `tempo: 140`) means the number of *beats* per minute. The `<divisions>` MusicXML states the number of time units per *quarter note* (not the *beat*!) - a quarter note may be half a beat in a `2/2` meter. Because of this, whole notes do not fit into less-than whole measures (e.g. `3/4` is filled by a dotted half note, or three quarter notes). Measure rests are an exception! They look like whole restst, but if they are alone in the measure, they are used even if the measure is less-than-whole. This is the only exception and MusicXML encodes them with a special attribute.
 
-When analyzing the OpenScore Lieder corpus, we find these time signatures being used:
+When analyzing the OpenScore Lieder Corpus, we find these time signatures being used:
 
 ```
      1/4  
