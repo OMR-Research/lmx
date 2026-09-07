@@ -281,7 +281,7 @@ Grace notes can be slashed, which in MusicXML is represented by an attribute `sl
 
 ### Clef `<clef>`
 
-In MusicXML a clef is represented within the `<attributes>` element in between notes. It has three important values:
+Clef is represented in MusicXML by the `<clef>` element inside of the `<attributes>` element. It contains three important pieces of information:
 
 - `<sign>` - what type of clef is this (G, C, F)
 - `<line>` - what staffline it sits on (1, 2, 3, 4, 5 - numbered from the bottom line up)
@@ -293,13 +293,13 @@ This is the distribution of clefs in the OpenScore Lieder corpus:
 Counter({'G2': 4018, 'F4': 2825, 'G1': 4, 'C1': 2, 'F3': 1})
 ```
 
-Clefs often change at the beginning of a measure. The first measure defines both clefs in one `<attributes>` element (staff 1 first, then staff 2). If the part is not a piano grandstaff, the staff number is omitted.
+Clef changes often happen at the beginning of a measure. The first measure defines both clefs in one `<attributes>` element (staff 1 first, then staff 2). If the part is not a piano grandstaff, the staff number is omitted.
 
 If a clef changes in the middle of a measure, it is annotated in the first voice of a staff. So second staff clef change is annotated in the sequence of notes of the first voice of the second staff. This is very likely defined by MuseScore, since MusicXML just states that the modification happens score-wise, not MusicXML note-order-wise. If at the beginning of a measure only one clef changes, only that one clef is notated. The other one is not - it is kept implicit from the previous measures. The specific placement of clefs in the note stream for these experiments is driven by the output ordering and formatting of MuseScore.
 
 Sometimes a clef is notated at the end of a system, because it changes at the beginning of the next system. This is only typesetting feature and is not encoded in MusicXML nor its linearization (but the clef change on the next system is of course encoded).
 
-In MusicXML, clefs at the beginning of systems are NOT explicitly encoded. However we train an end-to-end model that only gets systems, without the information of preceeding notation. So to correctly decode a system, we add explicit repetition of clefs at the beginning of each system measure (just like what is done in the actual printed score). (note that this does not apply for time signatures, only clefs and key signatures)
+In MusicXML, clefs at the beginning of systems are NOT explicitly encoded. However, we train an end-to-end model that only gets systems, without the information of preceeding notation. So to correctly decode a system, we add explicit repetition of clefs at the beginning of each system measure (just like what is done in the actual printed score). (Note that this does not apply for time signatures, only clefs and key signatures.)
 
 
 ### Key signature `<key>`, `<fifths>`
