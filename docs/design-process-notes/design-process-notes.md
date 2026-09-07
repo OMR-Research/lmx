@@ -62,9 +62,9 @@ C4 E4 G4 F5 ...
 
 This is the [scientific pitch notation](https://en.wikipedia.org/wiki/Scientific_pitch_notation).
 
-In MusicXML the octave ranges from 0 to 9 and steps are A, B, C, D, E, F, G.
+In MusicXML, the octave ranges from 0 to 9 and steps are A, B, C, D, E, F, G.
 
-In the OpenScore Lieder train dataset we encountered these pitches:
+In the OpenScore Lieder train dataset, we encountered these pitches:
 
 ```
 __ __ __ __ __ __ __
