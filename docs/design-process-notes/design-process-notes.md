@@ -274,7 +274,7 @@ Each note can contain zero or many duration dots. Each one of those dots is in M
 
 Grace notes are regular notes, that (are smaller) and don't have duration. Other than that, they behave like any other notes from the perspective of MusicXML.
 
-In MusicXML these are represented by an element `<grace>`, that behave similarly to the `<chord>` element. Therefore in the linearized representation, grace notes are represented by a `grace` token.
+In MusicXML these are represented by an element `<grace>`, that behaves similarly to the `<chord>` element. Therefore, in the linearized representation, grace notes are represented by a `grace` token.
 
 Grace notes can be slashed, which in MusicXML is represented by an attribute `slash="yes"`. If that attribute is present, then the `"grace"` token is followed by a `"grace:slash"` token.
 
