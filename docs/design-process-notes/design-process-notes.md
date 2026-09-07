@@ -635,7 +635,7 @@ This is an attempt at modelling the linearized MusicXML by a simple grammar:
 > - `#` is a line comment
 
 ```py
-# the whole linearized MusicXML sequecne is a [part] non-terminal
+# the whole linearized MusicXML sequence is a [part] non-terminal
 # and it is just a list of measures
 [part] = [measure]+
 
