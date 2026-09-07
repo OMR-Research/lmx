@@ -84,7 +84,7 @@ Since this covers almost the entire range, it makes sense to take all combinatio
 The `<alter>` value is ignored during linearization because:
 
 - It can be reconstructed from the key signature and preceeding accidentals.
-- It is not in any way explicitly visually present in the music score.
+- It is not in any way explicitly visually present in the music score. (See section [Accidental `<accidental>`, `[accidental]`](./design-process-notes.md#accidental-accidental-accidental) for information on explictly written accidentals.)
 - If added would introduce a stateful dependency across measures (from the key signature), which would break the encoding's measure-independence feature.
 
 
