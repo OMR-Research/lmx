@@ -614,7 +614,7 @@ We decided to keep these hacks in, because they cannot in many cases be correcte
 
 Here are the examples we found:
 
-- Read the section about stems, how when you have two slurs from different voices converging on one chord, the chord must be made up of two voices (because slurs cannot cross voices), and therefore one part of the chord is a normal chord, and the other part is a stem-less chord for the other voice.
+- Read the section about [stems](./design-process-notes.md#stem-stem-stem), how when you have two slurs from different voices converging on one chord, the chord must be made up of two voices (because slurs cannot cross voices), and therefore one part of the chord is a normal chord, and the other part is a stem-less chord for the other voice.
 - When a tie crosses between voices, the starting note is re-entered again in the other voice with `print-object="no"` attribute, so that the tie appears ok.
 - Rests can be deleted in secondary voices in MuseScore, which creates `<forward>` elements, but not in the primary voice. There you have to create an invisible (`print-object="no"`) rest instead.
 
