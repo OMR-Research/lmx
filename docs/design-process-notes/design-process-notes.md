@@ -336,7 +336,7 @@ In MusicXML, key signatures at the beginning of systems are NOT explicitly encod
 ### Time signature `<time>`, `[time]`
 
 > **On reading time in music:**<br>
-> Time signature consist of two numbers on top of each other (`C` means `4/4` and `crossed C` means `2/2`). The top number states the number *beats* per mesure, the bottom one states the type of the *beat*. `/2` means one beat is one half note, `/4` means one beat is one quarter note. The tempo (e.g. `tempo: 140`) means the number of *beats* per minute. The `<divisions>` MusicXML states the number of time units per *quarter note* (not the *beat*!) - a quarter note may be half a beat in a `2/2` meter. Because of this, whole notes do not fit into less-than whole measures (e.g. `3/4` is filled by a dotted half note, or three quarter notes). Measure rests are an exception! They look like whole restst, but if they are alone in the measure, they are used even if the measure is less-than-whole. This is the only exception and MusicXML encodes them with a special attribute.
+> Time signature consist of two numbers on top of each other (`C` means `4/4` and `crossed C` means `2/2`). The top number states the number of *beats* per mesure, the bottom one states the type of the *beat*. `/2` means one beat is one half note, `/4` means one beat is one quarter note. The tempo (e.g. `tempo: 140`) means the number of *beats* per minute. The `<divisions>` MusicXML states the number of time units per *quarter note* (not the *beat*!) - a quarter note may be half a beat in a `2/2` meter. Because of this, whole notes do not fit into less-than whole measures (e.g. `3/4` is filled by a dotted half note, or three quarter notes). Measure rests are an exception! They look like whole restst, but if they are alone in the measure, they are used even if the measure is less-than-whole. This is the only exception and MusicXML encodes them with a special attribute.
 
 When analyzing the OpenScore Lieder corpus, we find these time signatures being used:
 
@@ -367,14 +367,14 @@ Counter({'4/4': 705, '3/4': 546, '2/4': 538, '6/8': 326, '3/8': 149,
     '6/16': 2, '9/16': 2, '15/8': 2, '5/8': 1, '7/4': 1, '4/16': 1})
 ```
 
-So for this reason and for maximum similarity to MusicXML we decided to code both numbers as separate tokens. This adds these 20 tokens to our vocabulary:
+So, for this reason and for maximum similarity to MusicXML, we decided to encode both numbers as separate tokens. This adds the following 20 tokens to our vocabulary:
 
 ```
 beats:1 beats:2 beats:3 ... beats:16
 beat-type:2 beat-type:4 beat-type:8 beat-type:16
 ```
 
-We also add the token `time` that represents the `<time>` XML element, so that it's easier to decode malformed sequences (we can ignore all `beat` and `beat-type` tokens that do not follow a `time` token directly).
+We also add the token `time` that represents the `<time>` XML element, so that it's easier to decode malformed sequences (i.e., we can ignore all `beat` and `beat-type` tokens that do not follow a `time` token directly).
 
 So an example 3/4 time signature would be encoded as these three tokens:
 
@@ -391,7 +391,7 @@ Which neatly mirrors the XML:
 </time>
 ```
 
-Time signature in MusicXML is stated at the first measure and then during changes. In notation, the same behaviour occus (another words, time signature is NOT re-stated at the begining of each system). We DO NOT re-state the time signature at the beginning of each system even though we train an end-to-end model on individual systems. We don't do this because the printed notation does not do that AND the model does not need it, because the encoding does not enforce measure durations explicitly and note durations are encoded visually via the note type.
+Time signature in MusicXML is stated at the first measure and then during changes. In notation, the same behaviour occus (i.e., time signature is NOT re-stated at the begining of each system). We DO NOT re-state the time signature at the beginning of each system even though we train an end-to-end model on individual systems. We don't do this because the printed notation does not do that AND the model does not need it, because the encoding does not enforce measure durations explicitly and note durations are encoded visually via the note type.
 
 Sometimes the notation setting software places time signature at the end of a line, when the measure on the next line has a different time signature. This cautionary time signature is not encoded, only the next measure's time signature will be encoded.
 
