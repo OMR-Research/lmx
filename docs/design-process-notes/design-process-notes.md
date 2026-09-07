@@ -207,7 +207,7 @@ beam:begin beam:end beam:forward-hook beam:backward-hook
 
 The token is doubled (tripled, ...) if there are two or more beams running through a note (just like MusicXML has multiple `<beam>` elements).
 
-So a beamed group of 4 eighth C4 notes are represented like this:
+So the following example of a beamed group of 4 eighth notes (see next figure with clef G on line 2) is represented like this:
 
 ```
 G4 eighth beam:begin
@@ -218,13 +218,13 @@ A4 eighth beam:end
 
 <img src="https://www.w3.org/2021/06/musicxml40/static/datatypes/beam-value-begin.png">
 
-And if the first two a sixteenth notes and the last two are eighth notes:
+And if the first two are sixteenth notes and the last two are eighth notes, we have the following representation:
 
 ```
-C4 16th beam:begin beam:begin
-C4 16th beam:end
-C4 eighth
-C4 eighth beam:end
+G4 16th beam:begin beam:begin
+A4 16th beam:end
+G4 eighth
+A4 eighth beam:end
 ```
 
 There may also be a sixteenth hook, like this:
