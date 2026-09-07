@@ -27,7 +27,7 @@ In this documentation, MusicXML elements are represented by angle brackets (e.g.
 
 At the end of this document, there is a grammar pseudocode that specifies what tokens can be combined in what order.
 
-While MusicXML may allow more freedom in how music is represented (say, voices, backup/forward, staves), we based our decisions based on the data taken from the OpenScore Lieder corpus, when exported to MusicXML through MuseScore 3.6.2. This provides us with additional structure (such as voice order), which is not important in our case, but you should take into consideration if using other sources of MusicXML.
+While MusicXML may allow more freedom in how music is represented (say, voices, backup/forward, staves), we based our decisions on the data taken from the [OpenScore Lieder Corpus](https://github.com/OpenScore/Lieder), when exported to MusicXML through MuseScore 3.6.2. This provides us with additional structure (such as voice order), which is not important in our case, but you should take into consideration if using other sources of MusicXML.
 
 This is important, as there are multiple way how to encode the same music (multiple MusicXML documents that render to the same printed score). The variability is in:
 
@@ -37,7 +37,7 @@ This is important, as there are multiple way how to encode the same music (multi
 - naming of voices (for example, MuseScore names second-staff voices 5-8, instead of 1-4)
 - naming of other values, where MusicXML lets you input `string`, without further specification
 
-It is not obvious, how to choose the canonical representation among all possible representations of the same music piece. Therefore we decided to use MuseScore 3.6.2 as the source of canonical MusicXML for this project. If you ever need to harmonize MusicXML from multiple sources, consider these variations.
+It is not obvious how to choose a canonical representation among all possible representations of the same music piece. Therefore, we decided to use MuseScore 3.6.2 as the source of canonical MusicXML for this project. If you ever need to harmonize MusicXML from multiple sources, consider these variations.
 
 
 ## Reference documentation
@@ -52,9 +52,9 @@ A note is the fundamental building block of music and it consist of three proper
 
 #### Pitch `<pitch>`, `[pitch]`
 
-The core token that identifies a note is the pitch token. No other musical symbol contains pitch in MusicXML, you can see that [`<pitch>`](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/pitch/) element can only be a child of the `<note>` element.
+The core token that identifies a note is the pitch token. No other musical symbol contains pitch in MusicXML, you can see that the [`<pitch>`](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/pitch/) element can only be a child of the `<note>` element.
 
-In MusicXML, pitch is by `<octave>`, `<step>`, and `<alter>`. We join the first two values to build the pitch token:
+In MusicXML, the pitch is defined by its child elements `<octave>`, `<step>`, and `<alter>`. We join the first two values to build the pitch token:
 
 ```
 C4 E4 G4 F5 ...
@@ -62,9 +62,9 @@ C4 E4 G4 F5 ...
 
 This is the [scientific pitch notation](https://en.wikipedia.org/wiki/Scientific_pitch_notation).
 
-In MusicXML the octave ranges from 0 to 9 and steps are A, B, C, D, E, F, G.
+In MusicXML, the octave ranges from 0 to 9 and steps are A, B, C, D, E, F, G.
 
-In the OpenScore Lieder train dataset we encountered these pitches:
+In the OpenScore Lieder train dataset, we encountered these pitches:
 
 ```
 __ __ __ __ __ __ __
@@ -81,16 +81,16 @@ __ __ __ F0 G0 A0 B0
 
 Since this covers almost the entire range, it makes sense to take all combinations of 0-9 and A-G as the note pitch tokens, which gives us 70 distinct tokens.
 
-The `<alter>` value is ignored during linearization, because:
+The `<alter>` value is ignored during linearization because:
 
 - It can be reconstructed from the key signature and preceeding accidentals.
-- Is not in any way explicitly visually present in the music score.
+- It is not in any way explicitly visually present in the music score. (See section [Accidental `<accidental>`, `[accidental]`](./design-process-notes.md#accidental-accidental-accidental) for information on explictly written accidentals.)
 - If added would introduce a stateful dependency across measures (from the key signature), which would break the encoding's measure-independence feature.
 
 
 #### Duration `<type>`, `<duration>`, `[type]`
 
-Duration of a note in the linearized MusicXML is represented by the `<type>` element (note type, e.g. half, quarter, half). The `<duration>` element is designed for processing by audio replay software, and can be calculated back from the `<type>` is the given context (time signature, tuplets) is present, so we consciously ignore it.
+The duration of a note in the linearized MusicXML is represented by the `<type>` element (note type, e.g. quarter, half, whole). The `<duration>` element is designed for processing by audio replay software, and can be calculated back from the `<type>` if the given context (time signature, tuplets) is present, so we consciously ignore it.
 
 > We only make sure the `<duration>` value is what we expect, given the musical context.
 
@@ -144,7 +144,7 @@ MusicXML allows four values:
 down up double none
 ```
 
-In practise, notes without any stem lack the `<stem>` element completely. Similarly, notes with two stems are represented as two separate `<note>` elements in two different voices, each having its own stem. This means that in the OpenScore Lieder corpus, when exported by MuseScore, only `down` and `up` and missing `<stem>` element are possible values.
+In practise, notes without any stem lack the `<stem>` element completely. Similarly, notes with two stems are represented as two separate `<note>` elements in two different voices, each having its own stem. This means that in the OpenScore Lieder Corpus, when exported by MuseScore, only `down` and `up` and missing `<stem>` element are possible values.
 
 But there are cases, where slurs from multiple voices converge on a chord. Since slurs cannot cross voices, the solution is to have two chords, one for each voice, placed on top of each other, and one of the voices is missing its stems. This is where the `none` value is used. You can see in the picture, the last eighth note chord has green stem and flag, which means the second voice is normal. But the blue voice (first voice) only has the two noteheads, but no stem:
 
@@ -207,7 +207,7 @@ beam:begin beam:end beam:forward-hook beam:backward-hook
 
 The token is doubled (tripled, ...) if there are two or more beams running through a note (just like MusicXML has multiple `<beam>` elements).
 
-So a beamed group of 4 eighth C4 notes are represented like this:
+So the following example of a beamed group of 4 eighth notes (see next figure with clef G on line 2) is represented like this:
 
 ```
 G4 eighth beam:begin
@@ -218,13 +218,13 @@ A4 eighth beam:end
 
 <img src="https://www.w3.org/2021/06/musicxml40/static/datatypes/beam-value-begin.png">
 
-And if the first two a sixteenth notes and the last two are eighth notes:
+And if the first two are sixteenth notes and the last two are eighth notes, we have the following representation:
 
 ```
-C4 16th beam:begin beam:begin
-C4 16th beam:end
-C4 eighth
-C4 eighth beam:end
+G4 16th beam:begin beam:begin
+A4 16th beam:end
+G4 eighth
+A4 eighth beam:end
 ```
 
 There may also be a sixteenth hook, like this:
@@ -238,9 +238,9 @@ C5 eighth dot beam:end
 
 ### Accidental `<accidental>`, `[accidental]`
 
-The `<accidental>` element in MusicXML is present, when there's a graphical accidental visible in the score next to the note. This is the way our linearized MusicXML encodes semitones, not the `<alter>` pitch element, that is ignored.
+The `<accidental>` element in MusicXML is present when there's a graphical accidental visible in the score next to the note. This is the way our linearized MusicXML encodes semitones, not the `<alter>` pitch element, that is ignored.
 
-The OpenScore Lieder corpus uses these accidentals:
+The OpenScore Lieder Corpus uses these accidentals:
 
 ```
 sharp flat natural
@@ -254,9 +254,9 @@ This introduces 7 tokens to the linearized MusicXML vocabulary.
 
 ### Tie `<tied>`, `[tied]`
 
-The graphical representation of a tie is in MusicXML represented within the `<notations>` element by the presence of a `<tied>` element. There also exists a `<tie>` element, but that has audio meaning, not notation meaning so we ignore it.
+In MusicXML, a tie is represented graphically by the presence of a `<tied>` element within `<notations>`. MusicXML also defines a `<tie>` element, but this has an audio-related meaning rather than a notational one, so we ignore it.
 
-The element has one attribute `type` with values `start` and `stop`. We convert this to two tokens that we attach to a note:
+The element `<tied>` has one attribute `type` with values `start` and `stop`. We convert these to two tokens that we attach to a note:
 
 ```
 tied:start tied:stop
@@ -267,39 +267,39 @@ If a note is both an end and a start of a tie, it contains both of these tokens 
 
 ### Duration dot `<dot>`, `[dot]`
 
-Each note can contain zero or many duration dots. Each one of those dots is in MusicXML represented by a `<dot>` element. Each one of these element occurences gets translated to a `dot` token in the linearized MusicXML representation.
+Each note can contain zero or many duration dots. In MusicXML, each one of those dots is represented by a `<dot>` element. Each one of these element occurences gets translated to a `dot` token in the linearized MusicXML representation.
 
 
 ### Grace note `<grace>`, `[grace]`
 
 Grace notes are regular notes, that (are smaller) and don't have duration. Other than that, they behave like any other notes from the perspective of MusicXML.
 
-In MusicXML these are represented by an element `<grace>`, that behave similarly to the `<chord>` element. Therefore in the linearized representation, grace notes are represented by a `grace` token.
+In MusicXML these are represented by an element `<grace>`, that behaves similarly to the `<chord>` element. Therefore, in the linearized representation, grace notes are represented by a `grace` token.
 
 Grace notes can be slashed, which in MusicXML is represented by an attribute `slash="yes"`. If that attribute is present, then the `"grace"` token is followed by a `"grace:slash"` token.
 
 
 ### Clef `<clef>`
 
-In MusicXML a clef is represented within the `<attributes>` element in between notes. It has three important values:
+Clef is represented in MusicXML by the `<clef>` element inside of the `<attributes>` element. It contains three important pieces of information:
 
 - `<sign>` - what type of clef is this (G, C, F)
 - `<line>` - what staffline it sits on (1, 2, 3, 4, 5 - numbered from the bottom line up)
 - `number` - attribute containing the staff number (1 or 2 or missing)
 
-This is the distribution of clefs in the OpenScore Lieder corpus:
+This is the distribution of clefs in the OpenScore Lieder Corpus:
 
 ```py
 Counter({'G2': 4018, 'F4': 2825, 'G1': 4, 'C1': 2, 'F3': 1})
 ```
 
-Clefs often change at the beginning of a measure. The first measure defines both clefs in one `<attributes>` element (staff 1 first, then staff 2). If the part is not a piano grandstaff, the staff number is omitted.
+Clef changes often happen at the beginning of a measure. The first measure defines both clefs in one `<attributes>` element (staff 1 first, then staff 2). If the part is not a piano grandstaff, the staff number is omitted.
 
 If a clef changes in the middle of a measure, it is annotated in the first voice of a staff. So second staff clef change is annotated in the sequence of notes of the first voice of the second staff. This is very likely defined by MuseScore, since MusicXML just states that the modification happens score-wise, not MusicXML note-order-wise. If at the beginning of a measure only one clef changes, only that one clef is notated. The other one is not - it is kept implicit from the previous measures. The specific placement of clefs in the note stream for these experiments is driven by the output ordering and formatting of MuseScore.
 
 Sometimes a clef is notated at the end of a system, because it changes at the beginning of the next system. This is only typesetting feature and is not encoded in MusicXML nor its linearization (but the clef change on the next system is of course encoded).
 
-In MusicXML, clefs at the beginning of systems are NOT explicitly encoded. However we train an end-to-end model that only gets systems, without the information of preceeding notation. So to correctly decode a system, we add explicit repetition of clefs at the beginning of each system measure (just like what is done in the actual printed score). (note that this does not apply for time signatures, only clefs and key signatures)
+In MusicXML, clefs at the beginning of systems are NOT explicitly encoded. However, we train an end-to-end model that only gets systems, without the information of preceeding notation. So to correctly decode a system, we add explicit repetition of clefs at the beginning of each system measure (just like what is done in the actual printed score). (Note that this does not apply for time signatures, only clefs and key signatures.)
 
 
 ### Key signature `<key>`, `<fifths>`
@@ -307,7 +307,7 @@ In MusicXML, clefs at the beginning of systems are NOT explicitly encoded. Howev
 Key signature is represented in MusicXML by the `<key>` element inside of the `<attributes>` element. It can contain:
 
 - `<fifths>` - encodes the number of sharps or flats
-- `<cancel>` - explicit cancelling of the previous key signature, since not used in OpenScore Lieder corpus, we ignore this element
+- `<cancel>` - explicit cancelling of the previous key signature, since not used in OpenScore Lieder Corpus, we ignore this element
 - `<mode>` - specifies the mode of the key (major, minor, dorian, ... unusual ones), here only "major", "minor", and "none" are used in the corpus; but this element is ignored because it encodes a semantic "meaning" or "understanding" of the key with respect to the song - it has no effect on the number, or positioning of the key signature accidentals
 
 The `<fifths>` element value is a number - the number of flats/sharps, in range:
@@ -324,21 +324,21 @@ Counter({'0': 228, '1': 226, '-1': 212, '-3': 194, '2': 173, '4': 167,
     '7': 4, '-7': 3})
 ```
 
-Key signature is in MusicXML explicitly notated at the begining of a part even if it's 0. (maybe because MuseScore does that, not that MusicXML requires it). Then it's notated at the beginning of a measure whenever the signature changes.
+In MusicXML, the key signature is explicitly notated at the begining of each part even if it's 0. (Maybe because MuseScore does that, not that MusicXML requires it.) Then it's notated at the beginning of a measure whenever the signature changes.
 
-Key changes mid-measure are not allowed in MuseScore (see [this thread](https://musescore.org/en/node/91516)) and so they will not appear in our data.
+Key changes mid-measure are not allowed in MuseScore (see [this thread](https://musescore.org/en/node/91516)) and, so, they will not appear in our data.
 
-Sometimes a key change is notated at the end of a system, because it changes at the beginning of the next system. This is only typesetting feature and is not encoded in MusicXML nor its linearization (but the key change on the next system is of course encoded).
+Sometimes a key change is notated at the end of a system, because it changes at the beginning of the next system. This is only a typesetting feature and is not encoded in MusicXML nor its linearization (but the key change on the next system is of course encoded).
 
-In MusicXML, key signatures at the beginning of systems are NOT explicitly encoded. However we train an end-to-end model that only gets systems, without the information of preceeding notation. So to correctly decode a system, we add explicit repetition of key signatures at the beginning of each system measure (just like what is done in the actual printed score). (note that this does not apply for time signatures, only clefs and key signatures)
+In MusicXML, key signatures at the beginning of systems are NOT explicitly encoded. However we train an end-to-end model that only gets systems, without the information of preceeding notation. So to correctly decode a system, we add explicit repetition of key signatures at the beginning of each system measure (just like what is done in the actual printed score). (Note that this does not apply for time signatures, only clefs and key signatures.)
 
 
 ### Time signature `<time>`, `[time]`
 
 > **On reading time in music:**<br>
-> Time signature consist of two numbers on top of each other (`C` means `4/4` and `crossed C` means `2/2`). The top number states the number *beats* per mesure, the bottom one states the type of the *beat*. `/2` means one beat is one half note, `/4` means one beat is one quarter note. The tempo (e.g. `tempo: 140`) means the number of *beats* per minute. The `<divisions>` MusicXML states the number of time units per *quarter note* (not the *beat*!) - a quarter note may be half a beat in a `2/2` meter. Because of this, whole notes do not fit into less-than whole measures (e.g. `3/4` is filled by a dotted half note, or three quarter notes). Measure rests are an exception! They look like whole restst, but if they are alone in the measure, they are used even if the measure is less-than-whole. This is the only exception and MusicXML encodes them with a special attribute.
+> Time signature consist of two numbers on top of each other (`C` means `4/4` and `crossed C` means `2/2`). The top number states the number of *beats* per mesure, the bottom one states the type of the *beat*. `/2` means one beat is one half note, `/4` means one beat is one quarter note. The tempo (e.g. `tempo: 140`) means the number of *beats* per minute. The `<divisions>` MusicXML states the number of time units per *quarter note* (not the *beat*!) - a quarter note may be half a beat in a `2/2` meter. Because of this, whole notes do not fit into less-than whole measures (e.g. `3/4` is filled by a dotted half note, or three quarter notes). Measure rests are an exception! They look like whole restst, but if they are alone in the measure, they are used even if the measure is less-than-whole. This is the only exception and MusicXML encodes them with a special attribute.
 
-When analyzing the OpenScore Lieder corpus, we find these time signatures being used:
+When analyzing the OpenScore Lieder Corpus, we find these time signatures being used:
 
 ```
      1/4  
@@ -367,14 +367,14 @@ Counter({'4/4': 705, '3/4': 546, '2/4': 538, '6/8': 326, '3/8': 149,
     '6/16': 2, '9/16': 2, '15/8': 2, '5/8': 1, '7/4': 1, '4/16': 1})
 ```
 
-So for this reason and for maximum similarity to MusicXML we decided to code both numbers as separate tokens. This adds these 20 tokens to our vocabulary:
+So, for this reason and for maximum similarity to MusicXML, we decided to encode both numbers as separate tokens. This adds the following 20 tokens to our vocabulary:
 
 ```
 beats:1 beats:2 beats:3 ... beats:16
 beat-type:2 beat-type:4 beat-type:8 beat-type:16
 ```
 
-We also add the token `time` that represents the `<time>` XML element, so that it's easier to decode malformed sequences (we can ignore all `beat` and `beat-type` tokens that do not follow a `time` token directly).
+We also add the token `time` that represents the `<time>` XML element, so that it's easier to decode malformed sequences (i.e., we can ignore all `beat` and `beat-type` tokens that do not follow a `time` token directly).
 
 So an example 3/4 time signature would be encoded as these three tokens:
 
@@ -391,7 +391,7 @@ Which neatly mirrors the XML:
 </time>
 ```
 
-Time signature in MusicXML is stated at the first measure and then during changes. In notation, the same behaviour occus (another words, time signature is NOT re-stated at the begining of each system). We DO NOT re-state the time signature at the beginning of each system even though we train an end-to-end model on individual systems. We don't do this because the printed notation does not do that AND the model does not need it, because the encoding does not enforce measure durations explicitly and note durations are encoded visually via the note type.
+Time signature in MusicXML is stated at the first measure and then during changes. In notation, the same behaviour occus (i.e., time signature is NOT re-stated at the begining of each system). We DO NOT re-state the time signature at the beginning of each system even though we train an end-to-end model on individual systems. We don't do this because the printed notation does not do that AND the model does not need it, because the encoding does not enforce measure durations explicitly and note durations are encoded visually via the note type.
 
 Sometimes the notation setting software places time signature at the end of a line, when the measure on the next line has a different time signature. This cautionary time signature is not encoded, only the next measure's time signature will be encoded.
 
@@ -405,11 +405,11 @@ Here are some interesting scores, time signature-wise, for testing:
 
 ### Tuplets and tremolos `<tuplet>`, `<tremolo>`, `[tuplet]`, `[tremolo]`
 
-Tuplets and tremolos are the notation elements, that utilize MusicXML's `<time-modification>` element. This element lets us define notes, that are non-2 division of time.
+Tuplets and tremolos are the notation elements that use MusicXML's `<time-modification>` element. This element lets us define notes that are non-binary divisions of time.
 
-Normally, we have quarter notes and eighth notes. A quarter note triplet has duration in between - it takes 2/3 of a quarter note in duration. Similarly we can define fifths, sevenths, etc. A standalone tuplet note is identified by its type and the time-shrinking ratio from `<time-modification>`. For reason we decided to extend the note `[type]` with a `[time-modification]` token, which is computed directly from the `<time-modification>` MusicXML element.
+Normally, we have quarter notes and eighth notes. A quarter note triplet has duration in between — it takes 2/3 of a quarter note in duration. Similarly, we can define fifths, sevenths, etc. A standalone tuplet note is identified by its type and the time-shrinking ratio from `<time-modification>`. For this reason, we decided to extend the note `[type]` with a `[time-modification]` token, which is computed directly from the `<time-modification>` MusicXML element.
 
-So a quarter note triplet would be encoded like this:
+So, a quarter note triplet would be encoded like this:
 
 ```
 C4 quarter 3in2
@@ -419,7 +419,7 @@ There are two regular quarters in two quarters (in a half note), so a regular qu
 
 Sometimes, triplets are actually written in groups of 6, which makes them sixtuplets (with the same duration). In such a case, their time modification is `6in4` (which is technically identical to `3in2`, but semantically not).
 
-Apart from the duration information, tuplets are usually grouped by brackets or beams to form tuplet groups, so that they are easier to read. This information in MusicXML is stored in `<notations>/<tuplet>` element. We encode this information separately in two tokens:
+Apart from the duration information, tuplets are usually grouped by brackets or beams to form tuplet groups, so that they are easier to read. This information in MusicXML is stored in the `<notations>/<tuplet>` element. We encode this information separately in two tokens:
 
 ```
 tuplet:start tuplet:stop
@@ -427,7 +427,7 @@ tuplet:start tuplet:stop
 
 There are no nested tuplets in the corpus, so we ignore these.
 
-Double-note tremolos come with `<time-modification>` as well, because these are two notes, that together have the duration of one of only one of these notes. (e.g. two tremolo-beamed half notes in the duration of a single half note). For this reason, MusicXML adds a `2in1` time modification to these double tremolos. LMX keeps this information as well.
+Double-note tremolos come with `<time-modification>` as well, because these are two notes that together have the duration of only one of these notes (e.g. two tremolo-beamed half notes in the duration of a single half note). For this reason, MusicXML adds a `2in1` time modification to these double tremolos. LMX keeps this information as well.
 
 Tremolos are marked like other ornaments with tokens:
 
@@ -443,7 +443,7 @@ tremolo:3
 tremolo:4
 ```
 
-Tremolo element statisticis in OSLiC:
+Tremolo element statisticis in OpenScore Lieder Corpus:
 
 ```xml
 <tremolo type="start">3</tremolo>  1104
@@ -484,16 +484,16 @@ We encode all the time modification tokens that appear in the corpus.
 
 ### Measure `<measure>`, `[measure]`
 
-Measures begin with a `measure` token, and then a sequence of inner elements continues. So the `measure` token can be used as the measure separator and all information about the measure after the `measure` token and before the next `measure` token.
+Measures begin with a `measure` token, followed by a sequence of its inner elements. The `measure` token therefore serves as a measure separator, with all information belonging to a measure lying after one `measure` token and before the next.
 
 
 ### Staff `<staff>`, `[staff]`
 
 Monophonic music is typically written on only one-staff systems, whereas piano music is written onto two-staff systems. The piano two-staff system is sometimes called a grandstaff.
 
-There may be even three-staff systems and there is [one example in the corpus](https://musescore.com/openscore-lieder-corpus/scores/6005658)! But these cases are rare and will ignore them.
+There may be even three-staff systems and there is [one example in the corpus](https://musescore.com/openscore-lieder-corpus/scores/6005658)! But these cases are rare and we will ignore them.
 
-For single-staff music, there is no need to annotate which staff a given note belongs to. So none of the mentioned tokens are used in such a case. NOT EVEN EXPLICIT `staff:1` TOKENS! (because MusicXML does not include the `<staff>` elements in such a case either)
+For single-staff music, there is no need to annotate which staff a given note belongs to. So no staff-related tokens are used in such a case. NOT EVEN EXPLICIT `staff:1` TOKENS! (because MusicXML does not include the `<staff>` elements in such a case either)
 
 For grandstaff music, a voice may transition from one staff to the other, so we need explicit notation. A multi-staff part begins its first `<measure>` with a `<staves>` element inside the `<attributes>` element, which contains `2` - the number of staves that will be used. Since stave count changes mid-part are rare, we chose to ignore this element during linearization.
 
@@ -568,7 +568,7 @@ Since a backup element is used whenever we define polyphony, it's an event that 
 
 #### Invisible notes `print-object="no"`
 
-Sometimes, the input MusicXML contains invisible notes. Usually, these occur in ceratin hacks, where there was not a straightforward way how to encode a given piece of music. While it might seem unintuitive, we do encode this information in our linearized MusicXML sequence, because an ML model reading the notation has actually a way, how to figure out the presence of invisible symbols.
+Sometimes, the input MusicXML contains invisible notes. Usually, these occur in certain hacks where there was no straightforward way to encode a given passage of music. While it might seem unintuitive, we do encode this information in our linearized MusicXML sequence, because an ML model reading the notation has actually a way to figure out the presence of invisible symbols.
 
 Here are a few examples:
 
@@ -614,7 +614,7 @@ We decided to keep these hacks in, because they cannot in many cases be correcte
 
 Here are the examples we found:
 
-- Read the section about stems, how when you have two slurs from different voices converging on one chord, the chord must be made up of two voices (because slurs cannot cross voices), and therefore one part of the chord is a normal chord, and the other part is a stem-less chord for the other voice.
+- Read the section about [stems](./design-process-notes.md#stem-stem-stem), how when you have two slurs from different voices converging on one chord, the chord must be made up of two voices (because slurs cannot cross voices), and therefore one part of the chord is a normal chord, and the other part is a stem-less chord for the other voice.
 - When a tie crosses between voices, the starting note is re-entered again in the other voice with `print-object="no"` attribute, so that the tie appears ok.
 - Rests can be deleted in secondary voices in MuseScore, which creates `<forward>` elements, but not in the primary voice. There you have to create an invisible (`print-object="no"`) rest instead.
 
@@ -635,7 +635,7 @@ This is an attempt at modelling the linearized MusicXML by a simple grammar:
 > - `#` is a line comment
 
 ```py
-# the whole linearized MusicXML sequecne is a [part] non-terminal
+# the whole linearized MusicXML sequence is a [part] non-terminal
 # and it is just a list of measures
 [part] = [measure]+
 
@@ -864,7 +864,7 @@ This is an attempt at modelling the linearized MusicXML by a simple grammar:
 
 ## MusicXML element reference with implementation notes
 
-At [this page](https://www.w3.org/2021/06/musicxml40/musicxml-reference/element-tree/) you can see the list of all MusicXML elements in a tree-structure. Here we list these elements (or element groups) and state, whether they belong to the encoding, or are ignored for some reason:
+On [this page](https://www.w3.org/2021/06/musicxml40/musicxml-reference/element-tree/), you can see the list of all MusicXML elements in a tree structure. Below, we list these elements (or element groups) and state whether they are retained in the linearized encoding or are ignored for a particular reason.
 
 
 ### Used elements
@@ -911,15 +911,15 @@ Used elements:
 <technical> not explicitly linearized, only its contents
 <tied> converted to [tied]
 <tuplet> converted to [tuplet]
-<slur>
-<fermata>
-<arpeggiate>
-<staccato>
-<accent>
-<strong-accent>
-<tenuto>
-<tremolo>
-<trill-mark>
+<slur> converted to [slur]
+<fermata> converted to [fermata]
+<arpeggiate> converted to [arpeggiate]
+<staccato> converted to [staccato]
+<accent> converted to [accent]
+<strong-accent> converted to [strong-accent]
+<tenuto> converted to [tenuto]
+<tremolo> converted to [tremolo]
+<trill-mark> converted to [trill-mark]
 ```
 
 
@@ -938,7 +938,7 @@ Ignored, because they are metadata that do not affect the music itself:
 ```
 
 ```xml
-Ignored knowingly - it should never be added for some reason
+Ignored knowingly - it should never be added for the following reasons
 <directive> deprecated since MXL 2.0
 <print> contains layout information only, we DO use it for system slicing, but not for linearization
 <sound> contains non-visual data
