@@ -81,16 +81,16 @@ __ __ __ F0 G0 A0 B0
 
 Since this covers almost the entire range, it makes sense to take all combinations of 0-9 and A-G as the note pitch tokens, which gives us 70 distinct tokens.
 
-The `<alter>` value is ignored during linearization, because:
+The `<alter>` value is ignored during linearization because:
 
 - It can be reconstructed from the key signature and preceeding accidentals.
-- Is not in any way explicitly visually present in the music score.
+- It is not in any way explicitly visually present in the music score.
 - If added would introduce a stateful dependency across measures (from the key signature), which would break the encoding's measure-independence feature.
 
 
 #### Duration `<type>`, `<duration>`, `[type]`
 
-Duration of a note in the linearized MusicXML is represented by the `<type>` element (note type, e.g. half, quarter, half). The `<duration>` element is designed for processing by audio replay software, and can be calculated back from the `<type>` is the given context (time signature, tuplets) is present, so we consciously ignore it.
+The duration of a note in the linearized MusicXML is represented by the `<type>` element (note type, e.g. quarter, half, whole). The `<duration>` element is designed for processing by audio replay software, and can be calculated back from the `<type>` if the given context (time signature, tuplets) is present, so we consciously ignore it.
 
 > We only make sure the `<duration>` value is what we expect, given the musical context.
 
