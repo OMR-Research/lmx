@@ -238,7 +238,7 @@ C5 eighth dot beam:end
 
 ### Accidental `<accidental>`, `[accidental]`
 
-The `<accidental>` element in MusicXML is present, when there's a graphical accidental visible in the score next to the note. This is the way our linearized MusicXML encodes semitones, not the `<alter>` pitch element, that is ignored.
+The `<accidental>` element in MusicXML is present when there's a graphical accidental visible in the score next to the note. This is the way our linearized MusicXML encodes semitones, not the `<alter>` pitch element, that is ignored.
 
 The OpenScore Lieder corpus uses these accidentals:
 
