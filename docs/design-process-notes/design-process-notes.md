@@ -484,16 +484,16 @@ We encode all the time modification tokens that appear in the corpus.
 
 ### Measure `<measure>`, `[measure]`
 
-Measures begin with a `measure` token, and then a sequence of inner elements continues. So the `measure` token can be used as the measure separator and all information about the measure after the `measure` token and before the next `measure` token.
+Measures begin with a `measure` token, followed by a sequence of its inner elements. The `measure` token therefore serves as a measure separator, with all information belonging to a measure lying after one `measure` token and before the next.
 
 
 ### Staff `<staff>`, `[staff]`
 
 Monophonic music is typically written on only one-staff systems, whereas piano music is written onto two-staff systems. The piano two-staff system is sometimes called a grandstaff.
 
-There may be even three-staff systems and there is [one example in the corpus](https://musescore.com/openscore-lieder-corpus/scores/6005658)! But these cases are rare and will ignore them.
+There may be even three-staff systems and there is [one example in the corpus](https://musescore.com/openscore-lieder-corpus/scores/6005658)! But these cases are rare and we will ignore them.
 
-For single-staff music, there is no need to annotate which staff a given note belongs to. So none of the mentioned tokens are used in such a case. NOT EVEN EXPLICIT `staff:1` TOKENS! (because MusicXML does not include the `<staff>` elements in such a case either)
+For single-staff music, there is no need to annotate which staff a given note belongs to. So no staff-related tokens are used in such a case. NOT EVEN EXPLICIT `staff:1` TOKENS! (because MusicXML does not include the `<staff>` elements in such a case either)
 
 For grandstaff music, a voice may transition from one staff to the other, so we need explicit notation. A multi-staff part begins its first `<measure>` with a `<staves>` element inside the `<attributes>` element, which contains `2` - the number of staves that will be used. Since stave count changes mid-part are rare, we chose to ignore this element during linearization.
 
