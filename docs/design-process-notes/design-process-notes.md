@@ -254,9 +254,9 @@ This introduces 7 tokens to the linearized MusicXML vocabulary.
 
 ### Tie `<tied>`, `[tied]`
 
-The graphical representation of a tie is in MusicXML represented within the `<notations>` element by the presence of a `<tied>` element. There also exists a `<tie>` element, but that has audio meaning, not notation meaning so we ignore it.
+In MusicXML, a tie is represented graphically by the presence of a `<tied>` element within `<notations>`. MusicXML also defines a `<tie>` element, but this has an audio-related meaning rather than a notational one, so we ignore it.
 
-The element has one attribute `type` with values `start` and `stop`. We convert this to two tokens that we attach to a note:
+The element `<tied>` has one attribute `type` with values `start` and `stop`. We convert these to two tokens that we attach to a note:
 
 ```
 tied:start tied:stop
