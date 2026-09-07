@@ -54,7 +54,7 @@ A note is the fundamental building block of music and it consist of three proper
 
 The core token that identifies a note is the pitch token. No other musical symbol contains pitch in MusicXML, you can see that the [`<pitch>`](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/pitch/) element can only be a child of the `<note>` element.
 
-In MusicXML, pitch is by `<octave>`, `<step>`, and `<alter>`. We join the first two values to build the pitch token:
+In MusicXML, the pitch is defined by its child elements `<octave>`, `<step>`, and `<alter>`. We join the first two values to build the pitch token:
 
 ```
 C4 E4 G4 F5 ...
