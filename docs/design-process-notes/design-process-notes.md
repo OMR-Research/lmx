@@ -267,7 +267,7 @@ If a note is both an end and a start of a tie, it contains both of these tokens 
 
 ### Duration dot `<dot>`, `[dot]`
 
-Each note can contain zero or many duration dots. Each one of those dots is in MusicXML represented by a `<dot>` element. Each one of these element occurences gets translated to a `dot` token in the linearized MusicXML representation.
+Each note can contain zero or many duration dots. In MusicXML, each one of those dots is represented by a `<dot>` element. Each one of these element occurences gets translated to a `dot` token in the linearized MusicXML representation.
 
 
 ### Grace note `<grace>`, `[grace]`
@@ -324,13 +324,13 @@ Counter({'0': 228, '1': 226, '-1': 212, '-3': 194, '2': 173, '4': 167,
     '7': 4, '-7': 3})
 ```
 
-Key signature is in MusicXML explicitly notated at the begining of a part even if it's 0. (maybe because MuseScore does that, not that MusicXML requires it). Then it's notated at the beginning of a measure whenever the signature changes.
+In MusicXML, the key signature is explicitly notated at the begining of each part even if it's 0. (Maybe because MuseScore does that, not that MusicXML requires it.) Then it's notated at the beginning of a measure whenever the signature changes.
 
-Key changes mid-measure are not allowed in MuseScore (see [this thread](https://musescore.org/en/node/91516)) and so they will not appear in our data.
+Key changes mid-measure are not allowed in MuseScore (see [this thread](https://musescore.org/en/node/91516)) and, so, they will not appear in our data.
 
-Sometimes a key change is notated at the end of a system, because it changes at the beginning of the next system. This is only typesetting feature and is not encoded in MusicXML nor its linearization (but the key change on the next system is of course encoded).
+Sometimes a key change is notated at the end of a system, because it changes at the beginning of the next system. This is only a typesetting feature and is not encoded in MusicXML nor its linearization (but the key change on the next system is of course encoded).
 
-In MusicXML, key signatures at the beginning of systems are NOT explicitly encoded. However we train an end-to-end model that only gets systems, without the information of preceeding notation. So to correctly decode a system, we add explicit repetition of key signatures at the beginning of each system measure (just like what is done in the actual printed score). (note that this does not apply for time signatures, only clefs and key signatures)
+In MusicXML, key signatures at the beginning of systems are NOT explicitly encoded. However we train an end-to-end model that only gets systems, without the information of preceeding notation. So to correctly decode a system, we add explicit repetition of key signatures at the beginning of each system measure (just like what is done in the actual printed score). (Note that this does not apply for time signatures, only clefs and key signatures.)
 
 
 ### Time signature `<time>`, `[time]`
