@@ -864,7 +864,7 @@ This is an attempt at modelling the linearized MusicXML by a simple grammar:
 
 ## MusicXML element reference with implementation notes
 
-On [this page](https://www.w3.org/2021/06/musicxml40/musicxml-reference/element-tree/), you can see the list of all MusicXML elements in a tree structure. Below, we list these elements (or element groups) and state whether they are retained in the linearized encoding or are ignored for some reason.
+On [this page](https://www.w3.org/2021/06/musicxml40/musicxml-reference/element-tree/), you can see the list of all MusicXML elements in a tree structure. Below, we list these elements (or element groups) and state whether they are retained in the linearized encoding or are ignored for a particular reason.
 
 
 ### Used elements
@@ -911,15 +911,15 @@ Used elements:
 <technical> not explicitly linearized, only its contents
 <tied> converted to [tied]
 <tuplet> converted to [tuplet]
-<slur>
-<fermata>
-<arpeggiate>
-<staccato>
-<accent>
-<strong-accent>
-<tenuto>
-<tremolo>
-<trill-mark>
+<slur> converted to [slur]
+<fermata> converted to [fermata]
+<arpeggiate> converted to [arpeggiate]
+<staccato> converted to [staccato]
+<accent> converted to [accent]
+<strong-accent> converted to [strong-accent]
+<tenuto> converted to [tenuto]
+<tremolo> converted to [tremolo]
+<trill-mark> converted to [trill-mark]
 ```
 
 
@@ -938,7 +938,7 @@ Ignored, because they are metadata that do not affect the music itself:
 ```
 
 ```xml
-Ignored knowingly - it should never be added for some reason
+Ignored knowingly - it should never be added for the following reasons
 <directive> deprecated since MXL 2.0
 <print> contains layout information only, we DO use it for system slicing, but not for linearization
 <sound> contains non-visual data
