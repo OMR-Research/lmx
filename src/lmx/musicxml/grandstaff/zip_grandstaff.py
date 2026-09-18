@@ -1,6 +1,61 @@
 import xml.etree.ElementTree as ET
 import copy
 from .MeasureAsTracks import MeasureAsTracks
+from math import lcm
+
+
+def _harmonize_divisions_in_parts(
+        upper_part: ET.Element,
+        lower_part: ET.Element,
+) -> None:
+    """
+    Harmonizes divions between two single-staff parts
+    into one, the least common multiple.
+    
+    This method assumes that that each of the parts
+    contains at least one "<divisions>" element.
+    
+    The parts are modified in place.
+    """
+    assert upper_part.tag == "part"
+    assert lower_part.tag == "part"
+    
+    u_divisions = [
+        int(d.text) for d in upper_part.findall(".//divisions") if d.text is not None
+    ]
+    l_divisions = [
+        int(d.text) for d in lower_part.findall(".//divisions") if d.text is not None
+    ]
+    if len(u_divisions) == 0 or len(l_divisions) == 0:
+        raise ValueError(
+            "Each part has to contain at least one non-empty divisions element,"
+            f" found division for upper part: {u_divisions}, lower part: {upper_part}."
+        )
+    
+    # Every number of divisions is the same,
+    # no changes are needed
+    if len(set(u_divisions + l_divisions)) == 1:
+        return
+
+    lcm_d = lcm(*(u_divisions + l_divisions))
+    
+    for root, first_division in [(upper_part, u_divisions[0]), (lower_part, l_divisions[0])]:
+        current_division = first_division
+        for elem in root.iter():
+            # Update divisions factor
+            if elem.tag == 'divisions':
+                text = elem.text
+                if text is not None and len(text) > 0:
+                    current_division = int(text)
+            
+            # Update duration by divisions factor
+            elif elem.tag == 'duration':
+                text = elem.text
+                if text is not None and len(text) > 0:
+                    dur = int(text)
+                    assert lcm_d % current_division == 0
+                    expected_dur = lcm_d // current_division * dur
+                    elem.text = str(expected_dur)
 
 
 def zip_grandstaff(
@@ -26,6 +81,8 @@ def zip_grandstaff(
 
     assert len(upper_part) == len(lower_part), \
         "Both input parts must have the same number of measures"
+    
+    _harmonize_divisions_in_parts(upper_part, lower_part)
     
     output_part = ET.Element("part", {"id": output_part_id})
 
