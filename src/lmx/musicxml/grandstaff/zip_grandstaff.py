@@ -61,7 +61,8 @@ def _harmonize_divisions_in_parts(
 def zip_grandstaff(
         upper_part: ET.Element,
         lower_part: ET.Element,
-        output_part_id: str
+        output_part_id: str,
+        strict=True,
 ) -> ET.Element:
     """
     Combines two single-staff parts into one double-staff piano part.
@@ -75,6 +76,10 @@ def zip_grandstaff(
 
     This method works by splitting both parts into voices, renaming
     the second set of voices and merging them into a new part.
+
+    Use the strict option to process datasets and non-strict for
+    processing model predictions. It just toggles additional
+    assertions to be run in the algorithm.
     """
     assert upper_part.tag == "part"
     assert lower_part.tag == "part"
@@ -94,10 +99,12 @@ def zip_grandstaff(
     ):
         # parse both measures into tracks
         upper_measure = MeasureAsTracks.from_element(
-            copy.deepcopy(upper_measure_element)
+            copy.deepcopy(upper_measure_element),
+            strict=strict,
         )
         lower_measure = MeasureAsTracks.from_element(
-            copy.deepcopy(lower_measure_element)
+            copy.deepcopy(lower_measure_element),
+            strict=strict,
         )
 
         # rename voices in the lower measure

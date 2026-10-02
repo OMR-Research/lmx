@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 
 
 class Track:
-    def __init__(self) -> None:
+    def __init__(self, strict: bool) -> None:
         self.elements: list[ET.Element] = []
         """XML elements within this track (does not include the `<backup>` element)"""
 
@@ -18,6 +18,10 @@ class Track:
         self.total_duration: int = 0
         """Total duration in divisions used within the measure.
         Should match the duration of the final backup element if present."""
+
+        self.strict = strict
+        """Whether to run additional assertions.
+        Use strict for datasets, non-strict for model output."""
 
     def recompute_statistics(self):
         """Computes voice set, staff set and total duration"""
@@ -71,9 +75,14 @@ class Track:
 
     def run_assertions(self):
         """Runs checks to make sure the track is consistent"""
+        # do not run any assertions unless we're being strict
+        if not self.strict:
+            return
+        
         assert len(self.voice_set) <= 1, \
             "There should at most one voice per track, " + \
                 "voices: " + repr(self.voice_set)
+
         if self.backup_element is not None:
             assert self.backup_element.find("duration").text == str(self.total_duration), \
                 "Backup element should have duration equal to the " + \
@@ -168,7 +177,7 @@ class MeasureAsTracks:
     often present within the first voice.
     """
     
-    def __init__(self) -> None:
+    def __init__(self, strict: bool) -> None:
         self.measure_element_attributes: dict[str, str] = {}
         """The XML attributes on the `<measure>` element"""
 
@@ -187,6 +196,10 @@ class MeasureAsTracks:
         self.tracks: list[Track] = []
         """List of tracks in the measure, in the same order as in MXL"""
 
+        self.strict = strict
+        """Whether to run additional assertions.
+        Use strict for datasets, non-strict for model output."""
+
     def recompute_track_statistics(self):
         """Computes voice set and staff set for each track"""
         for track in self.tracks:
@@ -194,6 +207,10 @@ class MeasureAsTracks:
     
     def run_track_assertions(self):
         """Runs checks to make sure the track is consistent"""
+        # do not run any assertions unless we're being strict
+        if not self.strict:
+            return
+        
         for track in self.tracks:
             track.run_assertions()
         
@@ -208,9 +225,9 @@ class MeasureAsTracks:
                     "Tracks must have backup elements, except the last one"
 
     @staticmethod
-    def from_element(measure_element: ET.Element) -> "MeasureAsTracks":
+    def from_element(measure_element: ET.Element, strict=True) -> "MeasureAsTracks":
         """Constructs the measure with tracks from a measure element"""
-        measure = MeasureAsTracks()
+        measure = MeasureAsTracks(strict=strict)
         measure.measure_element_attributes = measure_element.attrib
         
         # take all child elements in the measure
@@ -255,13 +272,13 @@ class MeasureAsTracks:
         assert len(children) > 0, "The measure has no musical content"
 
         # parse out tracks by breaking at the <backup> elements
-        current_track = Track()
+        current_track = Track(strict=strict)
         
         for child in children:
             if child.tag == "backup":
                 current_track.backup_element = child
                 measure.tracks.append(current_track)
-                current_track = Track()
+                current_track = Track(strict=strict)
             else:
                 current_track.elements.append(child)
         

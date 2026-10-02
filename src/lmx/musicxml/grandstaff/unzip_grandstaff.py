@@ -30,7 +30,8 @@ def unzip_grandstaff(
         piano_part: ET.Element,
         upper_part_id: str,
         lower_part_id: str,
-        force_split=False
+        force_split=False,
+        strict=True,
 ) -> tuple[ET.Element, ET.Element]:
     """
     Given a `<part>` element containing a two-staff piano music,
@@ -56,6 +57,10 @@ def unzip_grandstaff(
 
     Then, it post-processes copies and erases `<staff>` tags and
     other-staff clefs and renames voices 5-8 back to 1-4.
+
+    Use the strict option to process datasets and non-strict for
+    processing model predictions. It just toggles additional
+    assertions to be run in the algorithm.
     """
     assert piano_part.tag == "part"
 
@@ -72,12 +77,14 @@ def unzip_grandstaff(
         if not force_split:
             _check_voice_staff_correspondence(
                 measure_element=measure_element,
-                measure_index=measure_index
+                measure_index=measure_index,
+                strict=strict,
             )
         
         # upper part measure
         measure = MeasureAsTracks.from_element(
-            copy.deepcopy(measure_element)
+            copy.deepcopy(measure_element),
+            strict=strict,
         )
         for voice in ["5", "6", "7", "8"]:
             measure.remove_track_with_voice(voice)
@@ -90,7 +97,8 @@ def unzip_grandstaff(
 
         # lower part measure
         measure = MeasureAsTracks.from_element(
-            copy.deepcopy(measure_element)
+            copy.deepcopy(measure_element),
+            strict=strict,
         )
         for voice in ["1", "2", "3", "4"]:
             measure.remove_track_with_voice(voice)
@@ -113,7 +121,8 @@ def unzip_grandstaff(
 
 def _check_voice_staff_correspondence(
         measure_element: ET.Element,
-        measure_index: int
+        measure_index: int,
+        strict: bool
 ):
     """
     Makes sure that each `<note>` has `<staff>` value that matches
@@ -122,7 +131,10 @@ def _check_voice_staff_correspondence(
     has a staff specified. It also checks that each `<clef>`
     has staff number specified.
     """
-    measure = MeasureAsTracks.from_element(measure_element)
+    measure = MeasureAsTracks.from_element(
+        measure_element,
+        strict=strict,
+    )
 
     measure_number = measure_element.get("number", None)
 
