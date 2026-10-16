@@ -1,6 +1,15 @@
-import xml.etree.ElementTree as ET
 import copy
+import xml.etree.ElementTree as ET
+
+from ..time.actual_durations_to_fractional import actual_durations_to_fractional
+from ..time.fractional_durations_to_actual import fractional_durations_to_actual
 from .MeasureAsTracks import MeasureAsTracks
+
+
+def optimize_divisions(part_element: ET.Element) -> None:
+    """Reduces the divisions number if it's unnecessarily high"""
+    actual_durations_to_fractional(part_element)
+    fractional_durations_to_actual(part_element)
 
 
 class ContainsTruePianoformMusicException(Exception):
@@ -115,6 +124,10 @@ def unzip_grandstaff(
         })
         # TODO: convert first-voice forwards to invisible rests
         lower_part.append(measure.to_element())
+    
+    # optimize divisions values
+    optimize_divisions(upper_part)
+    optimize_divisions(lower_part)
 
     return (upper_part, lower_part)
 

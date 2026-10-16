@@ -1,5 +1,8 @@
 import xml.etree.ElementTree as ET
 
+from ..sort_note_element import sort_note_element
+from ..sort_direction_element import sort_direction_element
+
 
 class Track:
     def __init__(self, strict: bool) -> None:
@@ -125,6 +128,12 @@ class Track:
                     staff_element = ET.Element("staff")
                     child.append(staff_element)
                 staff_element.text = str(staff)
+
+                # sort the inserted staff element into proper place
+                if child.tag == "note":
+                    sort_note_element(child)
+                if child.tag == "direction":
+                    sort_direction_element(child)
             elif child.tag == "attributes":
                 for subchild in child:
                     if subchild.tag in ["key", "clef", "staff-details", "measure-style"]:
@@ -142,8 +151,8 @@ class Track:
         for child in self.elements:
             if child.tag in ["note", "forward", "direction"]:
                 voice_element = child.find("voice")
-                if voice_element is not None:
-                    if voice_element.text in voice_map:
+                if voice_element is not None \
+                    and voice_element.text in voice_map:
                         voice_element.text = voice_map[voice_element.text]
         
         self.recompute_statistics()
@@ -352,7 +361,7 @@ class MeasureAsTracks:
             collapse_to_single_staff: bool
     ):
         """
-        In head elements, removes all clefs and signatures
+        In head elements, removes all clefs (not key/time signatures)
         that belong to the given staff. If specified, it also removes
         the number="X" attribute from the remaining elements as well
         as removing the <staves> element.
@@ -362,7 +371,9 @@ class MeasureAsTracks:
             children_to_remove: list[ET.Element] = []
 
             for child in self.head_attributes_element:
-                if child.tag in ["key", "clef", "staff-details", "measure-style"]:
+                # NOT <key> and <time> since they always apply to both
+                # (MusicXML does allow separation, but MuseScore does not)
+                if child.tag in ["clef", "staff-details", "measure-style"]:
                     if child.attrib.get("number", "1") == str(staff_to_remove):
                         children_to_remove.append(child)
                     elif collapse_to_single_staff:
@@ -400,7 +411,9 @@ class MeasureAsTracks:
         # <attributes> element
         if self.head_attributes_element is not None:
             for child in self.head_attributes_element:
-                if child.tag in ["key", "clef", "staff-details", "measure-style"]:
+                # NOT <key> and <time> since they always apply to both
+                # (MusicXML does allow separation, but MuseScore does not)
+                if child.tag in ["clef", "staff-details", "measure-style"]:
                     child.attrib["number"] = str(staff)
         
         # <print> element

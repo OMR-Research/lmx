@@ -1,7 +1,9 @@
-import xml.etree.ElementTree as ET
 import copy
-from .MeasureAsTracks import MeasureAsTracks
+import xml.etree.ElementTree as ET
 from math import lcm
+
+from ..attributes.sort_attributes import sort_attributes
+from .MeasureAsTracks import MeasureAsTracks
 
 
 def _harmonize_divisions_in_parts(
@@ -122,18 +124,18 @@ def zip_grandstaff(
         lower_measure.add_staff_tags_to_tracks(2)
 
         # merge heads
-        # (ignore print, we'll use the first part's one)
-        # (merge only clefs and key signatures)
+        # - <print> is taken only from the upper part
+        # - <key> is taken only from the upper part
+        # - <time> is taken only from the upper part
+        # - <clef>s are merged and numbers are added
         if lower_measure.head_attributes_element is not None:
             if upper_measure.head_attributes_element is None:
                 # transfer instead of merging
                 upper_measure.head_attributes_element = lower_measure.head_attributes_element
             elif upper_measure.head_attributes_element is not None:
-                # do the merge
+                # merge clefs
                 for clef in lower_measure.head_attributes_element.findall("clef"):
                     upper_measure.head_attributes_element.append(clef)
-                for key in lower_measure.head_attributes_element.findall("key"):
-                    upper_measure.head_attributes_element.append(key)
 
         # merge tails
         # (nothing, barlines will likely be in both input parts)
@@ -154,6 +156,12 @@ def zip_grandstaff(
             if upper_measure.head_attributes_element is not None:
                 for e in list(upper_measure.head_attributes_element.findall("staves")):
                     upper_measure.head_attributes_element.remove(e)
+        
+        # sort <attributes> children
+        if upper_measure.head_attributes_element is not None:
+            sort_attributes(upper_measure.head_attributes_element)
+        if lower_measure.head_attributes_element is not None:
+            sort_attributes(lower_measure.head_attributes_element)
 
         # merge tracks
         upper_measure.tracks[-1].add_computed_backup_element()
