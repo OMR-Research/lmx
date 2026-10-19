@@ -18,8 +18,14 @@ def serialize_musicxml_tree_to_string(
     
     musicxml_string = str(musicxml_stream, "utf-8")
 
-    # pretty-print
     if pretty:
+        # canonicalize (strip existing whitespace)
+        musicxml_string = ET.canonicalize(
+            musicxml_string,
+            strip_text=True,
+        )
+        
+        # pretty-print (add new, proper whitespace)
         dom = xml.dom.minidom.parseString(musicxml_string)
         musicxml_string = str(dom.toprettyxml(indent="  ", encoding="utf-8"), "utf-8")
 
